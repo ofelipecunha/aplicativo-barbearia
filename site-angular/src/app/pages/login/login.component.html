@@ -1,0 +1,65 @@
+<div class="login-page">
+  <!-- Lado esquerdo: promoção -->
+  <section class="login-left">
+    <div class="login-promo-overlay"></div>
+    <div class="login-promo-content">
+      <!-- <h2>Potencialize sua gestão comercial.</h2>
+      <p>Acesse sua conta para monitorar receitas, agendamentos e o desempenho da sua equipe em tempo real.</p> -->
+    </div>
+  </section>
+
+  <!-- Lado direito: formulário -->
+  <section class="login-right">
+    <div class="login-panel">
+      <div class="login-header">
+        <img src="/assets/logoWl.png" alt="Logo" class="login-logo-img" />
+        <h1>Wender Barbearia</h1>
+        <p class="login-subtitle">Seu visual, nosso compromisso.</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="field">
+          <label for="login">Login</label>
+          <div class="input-wrap">
+            <i class="pi pi-envelope"></i>
+            <input id="login" type="text" formControlName="login" placeholder="Digite seu login" autocomplete="username" />
+          </div>
+          @if (form.get('login')?.invalid && form.get('login')?.touched) {
+            <small class="error">Digite seu login</small>
+          }
+        </div>
+        <div class="field">
+          <label for="senha">Senha</label>
+          <div class="input-wrap">
+            <i class="pi pi-lock"></i>
+            <input id="senha" type="password" formControlName="senha" placeholder="********" autocomplete="current-password" />
+          </div>
+          @if (form.get('senha')?.invalid && form.get('senha')?.touched) {
+            <small class="error">Senha obrigatória</small>
+          }
+        </div>
+
+        <div class="form-options">
+          
+          <a routerLink="/esqueci-senha" class="link-forgot">Esqueceu sua senha?</a>
+        </div>
+
+        @if (errorMessage()) {
+          <div class="error-msg">{{ errorMessage() }}</div>
+        }
+        <button type="submit" class="btn-submit" [disabled]="loading">
+          @if (loading) {
+            <span class="spinner"></span>
+          } @else {
+            Entrar<i class="pi pi-arrow-right"></i>
+          }
+        </button>
+      </form>
+
+      <p class="login-register">
+        Não possui uma conta? <a routerLink="/cadastro">Criar conta</a>
+      </p>
+    </div>
+
+  </section>
+</div>

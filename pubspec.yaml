@@ -1,0 +1,49 @@
+name: barbearia
+description: A new Flutter project.
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  google_fonts: ^6.1.0
+  cupertino_icons: ^1.0.3
+  image_picker: ^1.0.7
+  lottie: ^1.1.0
+  curved_navigation_bar: ^1.0.1
+  carousel_slider: ^5.1.1
+  http: ^1.1.0
+  table_calendar: ^3.0.9
+  intl: ^0.20.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^1.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/category/
+    - assets/discount/
+    - assets/food/
+    - assets/main/
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/main/logoWl.png"
+
+

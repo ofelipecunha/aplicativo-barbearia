@@ -1,0 +1,4 @@
+$env:DATABASE_URL="postgres://postgres:123@localhost:5432/barbearia?sslmode=disable"
+cd "C:\Users\Felipe\Desktop\projetos\App Cabelereiro\BarbeariaFlutter-main\backend"
+go mod tidy
+go run ./cmd/server

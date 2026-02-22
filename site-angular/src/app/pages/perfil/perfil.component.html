@@ -1,0 +1,42 @@
+<div class="perfil">
+  <header class="header">
+    <div class="header-content">
+      <a routerLink="/dashboard"><i class="pi pi-arrow-left"></i></a>
+    </div>
+  </header>
+
+  <div class="content">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="avatar-wrap">
+        <img [src]="avatarUrl()" [alt]="user?.nome ?? ''" />
+      </div>
+      <h1>Meu perfil</h1>
+
+      <div class="field">
+        <label for="nome">Nome</label>
+        <input id="nome" type="text" pInputText formControlName="nome" class="full" />
+        @if (form.get('nome')?.invalid && form.get('nome')?.touched) {
+          <small class="error">Nome obrigatório</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="senha_atual">Senha atual</label>
+        <p-password id="senha_atual" formControlName="senha_atual" placeholder="Senha atual" [feedback]="false" [toggleMask]="true" styleClass="full-width" inputStyleClass="full"></p-password>
+      </div>
+      <div class="field">
+        <label for="nova_senha">Nova senha</label>
+        <p-password id="nova_senha" formControlName="nova_senha" placeholder="Nova senha" [feedback]="true" [toggleMask]="true" styleClass="full-width" inputStyleClass="full"></p-password>
+      </div>
+      <div class="field">
+        <label for="nova_senha_confirmation">Confirmar nova senha</label>
+        <p-password id="nova_senha_confirmation" formControlName="nova_senha_confirmation" placeholder="Confirmar nova senha" [feedback]="false" [toggleMask]="true" styleClass="full-width" inputStyleClass="full"></p-password>
+        @if (form.get('nova_senha_confirmation')?.value && form.get('nova_senha')?.value !== form.get('nova_senha_confirmation')?.value) {
+          <small class="error">Senhas não conferem</small>
+        }
+      </div>
+
+      <p-button type="submit" label="Salvar alterações" [loading]="loading" styleClass="btn"></p-button>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,1759 @@
+<div class="dashboard">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <img src="/assets/logoWl.png" alt="Logo" class="sidebar-logo-img" />
+      <h1>Wender Barbearia</h1>
+    </div>
+    <nav class="sidebar-nav">
+      <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
+        <i class="pi pi-home"></i>
+        <span>Inicio</span>
+      </a>
+      <button type="button" class="nav-item nav-item-btn" (click)="abrirModalProdutos()">
+        <i class="pi pi-box"></i>
+        <span>Produtos</span>
+      </button>
+      <button type="button" class="nav-item nav-item-btn" (click)="abrirModalServicos()">
+        <i class="pi pi-wrench"></i>
+        <span>Serviços</span>
+      </button>
+      <button type="button" class="nav-item nav-item-btn" (click)="abrirModalAgenda()">
+        <i class="pi pi-calendar"></i>
+        <span>Agenda</span>
+      </button>
+      <button type="button" class="nav-item nav-item-btn" (click)="abrirSolicitacaoUsuarios()">
+        <i class="pi pi-users"></i>
+        <span>Solicitações</span>
+      </button>
+      <div class="nav-group">
+        <button type="button" class="nav-item nav-item-btn nav-item-toggle" (click)="caixaOpen.set(!caixaOpen())" [class.expanded]="caixaOpen()">
+          <i class="pi pi-wallet"></i>
+          <span>Caixa</span>
+          <i class="pi nav-chevron" [class.pi-chevron-down]="!caixaOpen()" [class.pi-chevron-up]="caixaOpen()"></i>
+        </button>
+        @if (caixaOpen()) {
+          <div class="nav-sub">
+            <button type="button" class="nav-sub-item" (click)="abrirModalAberturaCaixa()">
+              <i class="pi pi-lock-open"></i>
+              <span>Abertura de Caixa</span>
+            </button>
+            <button type="button" class="nav-sub-item" (click)="abrirModalLancamentoManual()">
+              <i class="pi pi-plus-circle"></i>
+              <span>Lançamento Manual</span>
+            </button>
+            <button type="button" class="nav-sub-item" (click)="abrirModalSangria()">
+              <i class="pi pi-wallet"></i>
+              <span>Sangria</span>
+            </button>
+            <button type="button" class="nav-sub-item" (click)="abrirModalRecebimentoLista()">
+              <i class="pi pi-dollar"></i>
+              <span>Recebimento</span>
+            </button>
+            <button type="button" class="nav-sub-item" (click)="abrirModalEncerrarCaixa()">
+              <i class="pi pi-times-circle"></i>
+              <span>Encerrar Caixa</span>
+            </button>
+          </div>
+        }
+      </div>
+      <div class="nav-separator" aria-hidden="true"></div>
+      <div class="nav-group">
+        <button type="button" class="nav-item nav-item-btn nav-item-toggle" (click)="relatoriosOpen.set(!relatoriosOpen())" [class.expanded]="relatoriosOpen()">
+          <i class="pi pi-file-edit"></i>
+          <span>Relatórios</span>
+          <i class="pi nav-chevron" [class.pi-chevron-down]="!relatoriosOpen()" [class.pi-chevron-up]="relatoriosOpen()"></i>
+        </button>
+        @if (relatoriosOpen()) {
+          <div class="nav-sub">
+            <button type="button" class="nav-sub-item" (click)="abrirModalRelatorioProdutos()">
+              <i class="pi pi-box"></i>
+              <span>Produtos</span>
+            </button>
+            <button type="button" class="nav-sub-item" (click)="abrirModalRelatorioAtendimentos()">
+              <i class="pi pi-list"></i>
+              <span>Atendimentos</span>
+            </button>
+            <button type="button" class="nav-sub-item" (click)="abrirModalRelatorioAgenda()">
+              <i class="pi pi-calendar"></i>
+              <span>Agenda</span>
+            </button>
+            <button type="button" class="nav-sub-item" (click)="abrirModalRelatorioCabeleireiros()">
+              <i class="pi pi-users"></i>
+              <span>Cabeleireiros</span>
+            </button>
+          </div>
+        }
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="profile-card">
+        <button type="button" class="profile-avatar-wrap" (click)="avatarFileInput.click()" [disabled]="avatarUploading()" title="Alterar foto">
+          @if (avatarUploading()) {
+            <span class="profile-avatar profile-avatar-loading"><i class="pi pi-spin pi-spinner"></i></span>
+          } @else {
+            <img [src]="avatarUrl()" [alt]="user()?.nome ?? ''" class="profile-avatar" />
+          }
+        </button>
+        <input #avatarFileInput type="file" accept="image/*" class="profile-avatar-input" (change)="onAvatarSelected($event)" />
+        <div class="profile-info">
+          <span class="profile-nome">{{ user()?.nome }}</span>
+          <span class="profile-cargo">{{ cargoUsuario() }}</span>
+        </div>
+        <button type="button" class="btn-config" (click)="abrirModalConfiguracoes()">
+          <i class="pi pi-cog"></i>
+          <span>Configurações</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <header class="header">
+      <div class="header-left">
+        <span class="header-label">DASHBOARD</span>
+        <h2 class="header-title">{{ saudacao() }}, {{ nomeUsuario() }}</h2>
+      </div>
+      <div class="header-right">
+        <button type="button" class="btn-replay btn-replay-cliente" (click)="abrirModalNovoCliente()" title="+ Cliente">
+          <i class="pi pi-user-plus"></i>
+          <span>+ Cliente</span>
+        </button>
+        <button type="button" class="btn-replay" (click)="recarregarDashboard()" [disabled]="loading()" title="Atualizar cards e gráficos">
+          <i class="pi pi-refresh" [class.pi-spin]="loading()"></i>
+        </button>
+        <div class="search-wrap">
+          <i class="pi pi-search"></i>
+          <input type="text" placeholder="Buscar relatório..." class="search-input" />
+        </div>
+        <div class="notif-dropdown-wrap">
+          <button type="button" class="btn-icon notif" aria-label="Notificações" (click)="toggleNotificacoes()" [attr.aria-expanded]="notificacoesModalOpen()">
+            <i class="pi pi-bell"></i>
+            @if (notificacoesNaoLidas().length > 0) {
+              <span class="badge"></span>
+            }
+          </button>
+          @if (notificacoesModalOpen()) {
+            <div class="notif-dropdown-overlay" (click)="fecharModalNotificacoes()" role="button" tabindex="0" (keydown.escape)="fecharModalNotificacoes()"></div>
+            <div class="notif-dropdown-panel" (click)="$event.stopPropagation()" role="dialog" aria-label="Notificações">
+              <div class="notif-dropdown-header">
+                <h3>Notificações</h3>
+                <button type="button" class="notif-dropdown-close" (click)="fecharModalNotificacoes()" aria-label="Fechar">
+                  <i class="pi pi-times"></i>
+                </button>
+              </div>
+              <div class="notif-dropdown-body">
+                @if (notificacoesParaExibir().length === 0) {
+                  <p class="notif-dropdown-empty">Nenhuma notificação.</p>
+                } @else {
+                  <ul class="notif-dropdown-list">
+                    @for (n of notificacoesParaExibir(); track n.id) {
+                      <li
+                        class="notif-dropdown-item"
+                        [class.lida]="n.lido"
+                        (click)="aoClicarNotificacao(n)"
+                      >
+                        @if (isNotifRecebimento(n) || isNotifProduto(n)) {
+                          <div class="notif-dropdown-item-left" [class.recibo]="isNotifRecebimento(n)" [class.produto]="isNotifProduto(n)">
+                            @if (isNotifRecebimento(n)) {
+                              <i class="pi pi-dollar"></i>
+                            } @else if (notifImagemProdutoUrl(n)) {
+                              <img [src]="notifImagemProdutoUrl(n)" [alt]="n.titulo || 'Produto'" class="notif-dropdown-item-img" />
+                            } @else {
+                              <i class="pi pi-box"></i>
+                            }
+                          </div>
+                        }
+                        <div class="notif-dropdown-item-main">
+                          <div class="notif-dropdown-item-titulo">{{ n.titulo }}</div>
+                          @if (n.subtitulo || n.detalhe) {
+                            <div class="notif-dropdown-item-subtitulo">
+                              {{ n.subtitulo }}
+                              @if (n.detalhe) {
+                                <span class="notif-dropdown-item-detalhe">• {{ n.detalhe }}</span>
+                              }
+                            </div>
+                          }
+                          @if (n.valor != null) {
+                            <div class="notif-dropdown-item-valor">
+                              Valor: <strong>R$ {{ n.valor | number:'1.2-2':'pt-BR' }}</strong>
+                            </div>
+                          }
+                        </div>
+                        <div class="notif-dropdown-item-side">
+                          <span class="notif-dropdown-item-tipo">{{ n.tipo }}</span>
+                          <span class="notif-dropdown-item-tempo">{{ n.tempo_atras }}</span>
+                        </div>
+                      </li>
+                    }
+                  </ul>
+                }
+              </div>
+            </div>
+          }
+        </div>
+        <button type="button" class="btn-icon" aria-label="Sair" (click)="auth.logout()">
+          <i class="pi pi-sign-out"></i>
+        </button>
+      </div>
+    </header>
+
+    @if (loading()) {
+      <div class="loading-state">Carregando...</div>
+    } @else {
+      @if (recebimentoNotificacao()) {
+        <div class="recebimento-toast" (click)="abrirModalRecebimento()">
+          <div class="recebimento-toast-icon">
+            <i class="pi pi-dollar"></i>
+          </div>
+          <div class="recebimento-toast-content">
+            <div class="recebimento-toast-title">
+              RECEBIMENTO para {{ recebimentoNotificacao()!.subtitulo || 'Cliente' }}
+            </div>
+            <div class="recebimento-toast-text">
+              Valor:
+              <strong>
+                R$
+                {{
+                  recebimentoNotificacao()!.valor
+                    | number:'1.2-2':'pt-BR'
+                }}
+              </strong>
+            </div>
+            <div class="recebimento-toast-tempo">
+              {{ recebimentoNotificacao()!.tempo_atras }}
+            </div>
+          </div>
+          <button
+            type="button"
+            class="recebimento-toast-close"
+            (click)="fecharToastRecebimento($event)"
+            aria-label="Fechar notificação"
+          >
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+      }
+
+      <div class="dashboard-animate">
+      <!-- Overlay do filtro FATURAMENTO TOTAL (fora do card para o botão Aplicar receber clique) -->
+      @if (faturamentoFiltroOpen()) {
+        <div class="faturamento-filtro-overlay">
+          <div class="faturamento-filtro-backdrop" (click)="faturamentoFiltroOpen.set(false)" role="button" tabindex="0" (keydown.escape)="faturamentoFiltroOpen.set(false)"></div>
+          <div class="faturamento-filtro-panel" role="dialog" aria-label="Filtrar faturamento por período" [style.top.px]="faturamentoPanelTop()" [style.left.px]="faturamentoPanelLeft()">
+            <div class="card-faturamento-panel-row">
+              <label>Data início</label>
+              <input type="date" [ngModel]="faturamentoDataInicio()" (ngModelChange)="faturamentoDataInicio.set($event)" class="card-faturamento-date" />
+            </div>
+            <div class="card-faturamento-panel-row">
+              <label>Data final</label>
+              <input type="date" [ngModel]="faturamentoDataFim()" (ngModelChange)="faturamentoDataFim.set($event)" class="card-faturamento-date" />
+            </div>
+            <div class="card-faturamento-panel-actions">
+              <button type="button" class="card-faturamento-btn-aplicar" (click)="aplicarFaturamentoFiltro()" [disabled]="faturamentoFiltroCarregando()">
+                {{ faturamentoFiltroCarregando() ? '...' : 'Aplicar' }}
+              </button>
+              @if (faturamentoTotalFiltrado() !== null) {
+                <button type="button" class="card-faturamento-btn-limpar" (click)="limparFaturamentoFiltro()">Limpar</button>
+              }
+            </div>
+          </div>
+        </div>
+      }
+      <!-- Cards de métricas: CAIXA DO DIA || FATURAMENTO TOTAL || EM ESPERA || AGENDAMENTOS -->
+      <section class="cards">
+        <div class="card card-caixa card-clickable" (click)="abrirModalMovimentacoesCaixa()" role="button" tabindex="0" (keydown.enter)="abrirModalMovimentacoesCaixa()" (keydown.space)="abrirModalMovimentacoesCaixa(); $event.preventDefault()">
+          <div class="card-icon caixa">
+            <i class="pi pi-money-bill"></i>
+          </div>
+          <span class="card-label">CAIXA DO DIA</span>
+          <span class="card-value">R$ {{ saldoCaixa() | number:'1.2-2':'pt-BR' }}</span>
+          @if (caixaAberto()) {
+            <span class="card-detail">Abertura: R$ {{ valorAberturaCaixa() | number:'1.2-2':'pt-BR' }}</span>
+          } @else {
+            <span class="card-detail">Caixa fechado</span>
+          }
+        </div>
+        <div class="card card-faturamento-wrap">
+          <div class="card-faturamento-main">
+            <div class="card-icon receita">
+              <i class="pi pi-wallet"></i>
+            </div>
+            <span class="card-label">FATURAMENTO TOTAL</span>
+            <span class="card-value card-value--green">{{ valorFaturamentoCard() | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+            <div class="card-progress">
+              <div class="card-progress-fill" [style.width.%]="100"></div>
+            </div>
+          </div>
+          <div class="card-faturamento-filtro-wrap">
+            <button type="button" #faturamentoFiltroBtn class="card-faturamento-btn-filtro" (click)="toggleFaturamentoFiltro(); $event.stopPropagation()" [class.active]="faturamentoFiltroOpen()" [attr.aria-expanded]="faturamentoFiltroOpen()" title="Filtrar por período">
+              <i class="pi pi-filter"></i>
+            </button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-icon em-espera">
+            <i class="pi pi-users"></i>
+          </div>
+          <span class="card-label">EM ESPERA</span>
+          <span class="card-value">{{ clientesEmEspera() }}</span>
+          <span class="card-detail">Clientes aguardando</span>
+        </div>
+        <div class="card">
+          <div class="card-icon agendamentos">
+            <i class="pi pi-calendar"></i>
+          </div>
+          <span class="card-label">AGENDAMENTOS</span>
+          <span class="card-value">{{ totalAgendamentosMes() }}</span>
+          <span class="card-detail">Este mês</span>
+        </div>
+      </section>
+
+      <!-- Linha: Gráfico Atendimentos (col-6) + Gráfico Pizza (col-6) -->
+      <div class="charts-row">
+        <div class="col-6">
+      <!-- Gráfico Atendimentos -->
+      <section class="chart-section">
+        <div class="chart-header">
+          <h3>Gráfico Atendimentos</h3>
+        </div>
+        <div class="chart-wrap">
+          @if (graficoDados().length > 0) {
+            <div class="chart-bars-row">
+              <svg [attr.viewBox]="'0 0 ' + chartWidth + ' ' + chartHeight" class="chart-svg chart-svg-bars" preserveAspectRatio="xMidYMid meet">
+                <!-- Grade horizontal (como no app Flutter Fluxo de Caixa) -->
+                @for (gy of chartGridLines(); track gy) {
+                  <line [attr.x1]="chartPadding.left" [attr.y1]="gy" [attr.x2]="chartWidth - chartPadding.right" [attr.y2]="gy" class="chart-grid" />
+                }
+                <!-- Barras verticais laranja (clicável para abrir modal do dia) -->
+                @for (bar of chartBars(); track bar.index) {
+                  <rect
+                    [attr.x]="bar.x"
+                    [attr.y]="bar.y"
+                    [attr.width]="bar.width"
+                    [attr.height]="bar.height"
+                    fill="#ff9000"
+                    class="chart-bar chart-bar-clickable"
+                    rx="4"
+                    (click)="abrirModalAtendimentosDia(graficoDados()[bar.index].data)"
+                  />
+                }
+              </svg>
+              <!-- Rótulos abaixo de cada barra: dia (número), clicável -->
+              <div class="chart-labels-row">
+                @for (d of graficoDados(); track d.data) {
+                  <span class="chart-label chart-label-clickable" (click)="abrirModalAtendimentosDia(d.data)">{{ diaDoMes(d.data) }}</span>
+                }
+              </div>
+            </div>
+          } @else {
+            <div class="chart-empty">Sem dados no período</div>
+          }
+        </div>
+      </section>
+        </div>
+        <div class="col-6">
+      <!-- Produtos em estoque -->
+      <section class="chart-section estoque-section">
+        <div class="chart-header estoque-header">
+          <h3>Produtos em estoque</h3>
+        </div>
+        <div class="chart-pie-wrap estoque-wrap">
+          <div class="estoque-search-wrap">
+            <i class="pi pi-search"></i>
+            <input
+              type="text"
+              class="estoque-search-input"
+              placeholder="Pesquisar produto..."
+              [ngModel]="searchProduto()"
+              (ngModelChange)="searchProduto.set($event)"
+            />
+          </div>
+          <div class="estoque-grid-wrap">
+            <table class="estoque-grid">
+              <thead>
+                <tr>
+                  <th>Descrição</th>
+                  <th class="th-qtd">Quantidade</th>
+                  <th class="th-img"></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (p of produtosEstoqueFiltrados(); track p.id) {
+                  <tr [class.estoque-baixo]="isEstoqueBaixo(p)">
+                    <td>{{ p.descricao || '—' }}</td>
+                    <td class="td-qtd">{{ p.estoque }}</td>
+                    <td class="td-img">
+                      @if (produtoImagemUrl(p)) {
+                        <img [src]="produtoImagemUrl(p)" [alt]="p.descricao || 'Produto'" class="estoque-produto-img" />
+                      } @else {
+                        <span class="estoque-produto-placeholder">
+                          <i class="pi pi-image"></i>
+                        </span>
+                      }
+                    </td>
+                  </tr>
+                }
+                @empty {
+                  <tr>
+                    <td colspan="3" class="estoque-empty">{{ searchProduto().trim() ? 'Nenhum produto encontrado.' : 'Nenhum produto cadastrado.' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+        </div>
+      </div>
+
+      <!-- Grid inferior: Atendimentos e valor por profissional + Agenda + Atividade -->
+      <div class="grid-bottom">
+        <section class="panel media-prof">
+          <div class="panel-head panel-head-prof">
+            <h3>Cabeleireiros</h3>
+            <div class="prof-head-right">
+              <button type="button" class="link-ver" (click)="abrirModalVerTodosCabeleireiros()">Ver todos</button>
+            </div>
+          </div>
+          <div class="prof-list-scroll-wrap">
+            <ul class="prof-list">
+              @for (p of rankingProfissionais(); track p.nome) {
+                <li class="prof-item">
+                  <img [src]="avatarUrlNome(p.nome)" [alt]="p.nome" class="prof-avatar" />
+                  <div class="prof-info">
+                    <span class="prof-nome">{{ p.nome }}</span>
+                    <span class="prof-media">{{ p.atendimentos }} {{ p.atendimentos === 1 ? 'atendimento' : 'atendimentos' }}</span>
+                  </div>
+                  <span class="prof-valor">{{ p.total | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+                </li>
+              }
+              @empty {
+                <li class="prof-empty">Nenhum dado no período</li>
+              }
+            </ul>
+          </div>
+        </section>
+
+        <section class="panel agenda-panel">
+          <div class="panel-head panel-head-agenda">
+            <h3>Agenda</h3>
+            <div class="agenda-head-right">
+              @if (agendaLista().length > 5) {
+                <button type="button" class="btn-agenda-calendar" (click)="openAgendaModal()" title="Ver todos os registros">
+                  <i class="pi pi-calendar"></i>
+                </button>
+              }
+              <div class="agenda-filter-wrap">
+                <button type="button" class="btn-agenda-filtro" (click)="toggleAgendaFiltro()" [class.active]="agendaFiltroOpen()" title="Filtros">
+                  <i class="pi pi-filter"></i>
+                </button>
+                @if (agendaFiltroOpen()) {
+                  <div class="agenda-filter-panel">
+                    <form [formGroup]="agendaFiltroForm" (ngSubmit)="aplicarAgendaFiltro()">
+                      <div class="filter-field">
+                        <label>Mês</label>
+                        <input type="month" formControlName="mes" />
+                      </div>
+                      <div class="filter-field">
+                        <label>Cabeleireiro</label>
+                        <select formControlName="id_cabeleireiro">
+                          <option value="">Todos</option>
+                          @for (c of cabeleireiros(); track c.id) {
+                            <option [value]="c.id">{{ c.nome }}</option>
+                          }
+                        </select>
+                      </div>
+                      <div class="filter-field">
+                        <label>Status</label>
+                        <select formControlName="status">
+                          <option value="">Todos</option>
+                          <option value="AGENDADO">AGENDADO</option>
+                          <option value="CONFIRMADO">CONFIRMADO</option>
+                          <option value="CANCELADO">CANCELADO</option>
+                          <option value="FINALIZADO">FINALIZADO</option>
+                        </select>
+                      </div>
+                      <button type="submit" class="btn-aplicar">Aplicar</button>
+                    </form>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+          <div class="agenda-table-wrap">
+            <table class="agenda-table">
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Cabeleireiro</th>
+                  <th>Status</th>
+                  <th>Data/Hora</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (a of agendaListaCard(); track a.id) {
+                  <tr>
+                    <td>{{ a.nomeCliente || '—' }}</td>
+                    <td>{{ a.cabeleireiro || '—' }}</td>
+                    <td>{{ a.status }}</td>
+                    <td>{{ formatarDataHoraAgenda(a.data_hora) }}</td>
+                  </tr>
+                }
+                @empty {
+                  <tr>
+                    <td colspan="4" class="agenda-empty-cell">Nenhum agendamento</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+      </div>
+    }
+  </main>
+</div>
+
+<!-- Modal Agenda (calendário com dias em verde) -->
+@if (agendaModalOpen()) {
+  <div class="agenda-modal-overlay" (click)="closeAgendaModal()" role="button" tabindex="0" (keydown.escape)="closeAgendaModal()">
+    <div class="agenda-modal agenda-modal-calendario" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+      <div class="agenda-modal-header">
+        <h3>Agenda</h3>
+        <button type="button" class="agenda-modal-close" (click)="closeAgendaModal()" aria-label="Fechar">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+      <div class="agenda-calendario-wrap">
+        <div class="agenda-calendario-nav">
+          <button type="button" class="agenda-calendario-nav-btn" (click)="navegarMesCalendario(-1)" aria-label="Mês anterior">
+            <i class="pi pi-chevron-left"></i>
+          </button>
+          <span class="agenda-calendario-mes">{{ agendaCalendarioTitulo() }}</span>
+          <button type="button" class="agenda-calendario-nav-btn" (click)="navegarMesCalendario(1)" aria-label="Próximo mês">
+            <i class="pi pi-chevron-right"></i>
+          </button>
+        </div>
+        <div class="agenda-calendario-grid">
+          <div class="agenda-calendario-weekdays">
+            <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
+          </div>
+          <div class="agenda-calendario-dias">
+            @for (cell of agendaCalendarioDias(); track cell.data.getTime()) {
+              <button
+                type="button"
+                class="agenda-calendario-dia"
+                [class.outside]="!cell.isCurrentMonth"
+                [class.has-agendamento]="cell.isCurrentMonth && diaTemAgendamento(cell.data)"
+                [class.selected]="cell.isCurrentMonth && agendaDiaSelecionado() === cell.dataStr"
+                [disabled]="!cell.isCurrentMonth"
+                (click)="selecionarDiaCalendario(cell.data, cell.isCurrentMonth)"
+              >
+                {{ cell.dia }}
+              </button>
+            }
+          </div>
+        </div>
+        <p class="agenda-calendario-leyenda">Dias em verde possuem agendamentos. Clique no dia para ver a lista.</p>
+        @if (agendaDiaSelecionado(); as dataStr) {
+          <div class="agenda-dia-list">
+            <div class="agenda-dia-list-head">
+              <span class="agenda-dia-list-title">Agendamentos do dia {{ agendaDiaSelecionadoFormatado() }}</span>
+              <button type="button" class="agenda-dia-list-fechar" (click)="fecharDiaSelecionado()">Fechar</button>
+            </div>
+            @if (agendamentosDoDiaSelecionado().length > 0) {
+              <ul class="agenda-dia-list-ul">
+                @for (a of agendamentosDoDiaSelecionado(); track a.id) {
+                  <li class="agenda-dia-list-li">
+                    <span class="agenda-dia-cliente">{{ a.nomeCliente || '—' }}</span>
+                    <span class="agenda-dia-hora">{{ formatarDataHoraAgenda(a.data_hora) }}</span>
+                    <span class="agenda-dia-cabeleireiro">{{ a.cabeleireiro || '—' }}</span>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="agenda-dia-list-empty">Nenhum agendamento neste dia.</p>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal Solicitação de Usuários (DONO) -->
+@if (solicitacoesModalOpen()) {
+  <div
+    class="solicitacoes-overlay"
+    (click)="fecharModalSolicitacoes()"
+    role="button"
+    tabindex="0"
+    (keydown.escape)="fecharModalSolicitacoes()"
+  >
+    <div
+      class="solicitacoes-modal"
+      (click)="$event.stopPropagation()"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div class="solicitacoes-header">
+        <h3>Solicitação de Usuários</h3>
+        <button
+          type="button"
+          class="solicitacoes-close"
+          (click)="fecharModalSolicitacoes()"
+          aria-label="Fechar"
+        >
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+      <div class="solicitacoes-body">
+        @if (solicitacoesCarregando()) {
+          <p class="solicitacoes-loading">Carregando...</p>
+        } @else if (solicitacoesList().length === 0) {
+          <p class="solicitacoes-empty">Nenhum usuário aguardando aprovação.</p>
+        } @else {
+          <ul class="solicitacoes-list">
+            @for (u of solicitacoesList(); track u.id) {
+              <li class="solicitacao-item">
+                <div class="solicitacao-info">
+                  <span class="solicitacao-nome">{{ u.nome }}</span>
+                  <span class="solicitacao-login">{{ u.login }}</span>
+                  <span class="solicitacao-perfil">{{ u.perfil }}</span>
+                </div>
+                <div class="solicitacao-actions">
+                  <button
+                    type="button"
+                    class="btn-solicitacao btn-aprovar"
+                    [disabled]="solicitacaoAcaoId() === u.id"
+                    (click)="aprovarSolicitacao(u)"
+                  >
+                    @if (solicitacaoAcaoId() === u.id) {
+                      <i class="pi pi-spin pi-spinner"></i>
+                    } @else {
+                      <i class="pi pi-check"></i> Aprovar
+                    }
+                  </button>
+                  <button
+                    type="button"
+                    class="btn-solicitacao btn-desconsiderar"
+                    [disabled]="solicitacaoAcaoId() === u.id"
+                    (click)="desconsiderarSolicitacao(u)"
+                  >
+                    <i class="pi pi-times"></i> Desconsiderar
+                  </button>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal de recebimento (toast de RECEBIMENTO) -->
+@if (recebimentoModalOpen() && recebimentoNotificacao()) {
+  <div
+    class="recebimento-overlay"
+    (click)="fecharModalRecebimento()"
+    role="button"
+    tabindex="0"
+    (keydown.escape)="fecharModalRecebimento()"
+  >
+    <div
+      class="recebimento-modal"
+      (click)="$event.stopPropagation()"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div class="recebimento-header">
+        <h3>Receber pagamento</h3>
+        <button
+          type="button"
+          class="recebimento-close"
+          (click)="fecharModalRecebimento()"
+          aria-label="Fechar"
+        >
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+      <div class="recebimento-body">
+        <div class="recebimento-block recebimento-block-cliente-valor">
+          <span class="recebimento-block-label">CLIENTE</span>
+          <div class="recebimento-block-content">
+            <span class="recebimento-block-icon recebimento-icon-user"><i class="pi pi-user"></i></span>
+            <span class="recebimento-block-value">{{ recebimentoNotificacao()!.subtitulo || 'Cliente' }}</span>
+            <span class="recebimento-block-value recebimento-valor-numero">R$ {{ recebimentoNotificacao()!.valor! | number:'1.2-2':'pt-BR' }}</span>
+          </div>
+        </div>
+        <div class="recebimento-detalhe">
+          <span class="recebimento-block-label">O QUE FOI LANÇADO</span>
+          @if (recebimentoDetalheCarregando()) {
+            <p class="recebimento-detalhe-loading">Carregando serviços e produtos...</p>
+          } @else {
+            @let detalhe = recebimentoDetalhe();
+            @if (detalhe) {
+              @if (detalhe.servicos && detalhe.servicos.length > 0) {
+                <div class="recebimento-detalhe-block">
+                  <strong>Serviços</strong>
+                  <ul>
+                    @for (s of detalhe.servicos; track s.descricao + s.valor) {
+                      <li>{{ s.descricao }} — {{ s.valor | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</li>
+                    }
+                  </ul>
+                </div>
+              }
+              @if (detalhe.produtos && detalhe.produtos.length > 0) {
+                <div class="recebimento-detalhe-block">
+                  <strong>Produtos</strong>
+                  <ul>
+                    @for (p of detalhe.produtos; track p.descricao + p.quantidade) {
+                      <li>{{ p.descricao }} — {{ p.quantidade }} x {{ p.valor | currency:'BRL':'symbol':'1.2-2':'pt-BR' }} = {{ p.subtotal | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</li>
+                    }
+                  </ul>
+                </div>
+              }
+              @if ((!detalhe.servicos || detalhe.servicos.length === 0) && (!detalhe.produtos || detalhe.produtos.length === 0)) {
+                <p class="recebimento-detalhe-empty">Nenhum serviço ou produto lançado.</p>
+              }
+            } @else {
+              <p class="recebimento-detalhe-empty">Não foi possível carregar o detalhe.</p>
+            }
+          }
+        </div>
+        <p class="recebimento-forma-titulo">Forma de pagamento</p>
+        <div class="recebimento-tipo-group">
+          <button
+            type="button"
+            class="recebimento-tipo-btn"
+            [class.active]="tipoPagamentoRecebimento() === 'DINHEIRO'"
+            (click)="setTipoPagamentoRecebimento('DINHEIRO')"
+          >
+            <i class="pi pi-money-bill"></i>
+            <span>Dinheiro</span>
+          </button>
+          <button
+            type="button"
+            class="recebimento-tipo-btn"
+            [class.active]="tipoPagamentoRecebimento() === 'PIX'"
+            (click)="setTipoPagamentoRecebimento('PIX')"
+          >
+            <i class="pi pi-qrcode"></i>
+            <span>Pix</span>
+          </button>
+          <button
+            type="button"
+            class="recebimento-tipo-btn"
+            [class.active]="tipoPagamentoRecebimento() === 'CARTAO_CREDITO' || tipoPagamentoRecebimento() === 'CARTAO_DEBITO'"
+            (click)="setTipoPagamentoRecebimento('CARTAO_CREDITO')"
+          >
+            <i class="pi pi-credit-card"></i>
+            <span>Cartão</span>
+          </button>
+        </div>
+        @if (tipoPagamentoRecebimento() === 'CARTAO_CREDITO' || tipoPagamentoRecebimento() === 'CARTAO_DEBITO') {
+          <div class="recebimento-cartao-sub">
+            <button type="button" class="recebimento-tipo-sub" [class.active]="tipoPagamentoRecebimento() === 'CARTAO_CREDITO'" (click)="setTipoPagamentoRecebimento('CARTAO_CREDITO')">Crédito</button>
+            <button type="button" class="recebimento-tipo-sub" [class.active]="tipoPagamentoRecebimento() === 'CARTAO_DEBITO'" (click)="setTipoPagamentoRecebimento('CARTAO_DEBITO')">Débito</button>
+          </div>
+        }
+        @if (recebimentoErro()) {
+          <p class="recebimento-erro">{{ recebimentoErro() }}</p>
+        }
+        <div class="recebimento-footer">
+          <button
+            type="button"
+            class="recebimento-btn-pri"
+            [disabled]="recebimentoCarregando()"
+            (click)="confirmarRecebimentoNotificacao()"
+          >
+            {{ recebimentoCarregando() ? 'Salvando...' : 'Confirmar recebimento' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+<!-- Modal Movimentações do Caixa (ao clicar no card CAIXA DO DIA) — mesma chamada do dashboard-recepcao -->
+@if (movimentacoesCaixaModalOpen()) {
+  <div class="prod-overlay" (click)="fecharModalMovimentacoesCaixa()" role="button" tabindex="0">
+    <div class="prod-modal movimentacoes-modal" (click)="$event.stopPropagation()" role="dialog">
+      <div class="prod-modal-head">
+        <h3>Movimentações do Caixa — Hoje</h3>
+        <button type="button" class="prod-close" (click)="fecharModalMovimentacoesCaixa()"><i class="pi pi-times"></i></button>
+      </div>
+      <div class="prod-modal-body">
+        @if (carregandoMovimentacoesCaixa()) {
+          <p class="prod-loading">Carregando movimentações...</p>
+        } @else if (listaMovimentacoesCaixa().length === 0) {
+          <p class="prod-empty">Nenhuma movimentação no caixa hoje.</p>
+        } @else {
+          <table class="prod-table">
+            <thead>
+              <tr>
+                <th>Tipo</th>
+                <th>Descrição</th>
+                <th class="th-num">Valor</th>
+                <th>Data/Hora</th>
+                <th>Pagamento</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (l of listaMovimentacoesCaixa(); track l.id) {
+                <tr>
+                  <td>
+                    <span class="mov-tipo" [class.entrada]="l.tipo === 'ENTRADA'" [class.saida]="l.tipo === 'SAIDA'">
+                      {{ l.tipo === 'ENTRADA' ? 'Entrada' : 'Saída' }}
+                    </span>
+                  </td>
+                  <td>{{ l.nome || l.observacao || '—' }}</td>
+                  <td class="td-num" [class.valor-entrada]="l.tipo === 'ENTRADA'" [class.valor-saida]="l.tipo === 'SAIDA'">
+                    {{ l.tipo === 'ENTRADA' ? '+' : '-' }} R$ {{ l.valor | number:'1.2-2':'pt-BR' }}
+                  </td>
+                  <td>{{ formatarDataHoraMovimentacao(l.data) }}</td>
+                  <td>{{ l.tipo_pagamento || '—' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal Abertura de Caixa (sidebar Caixa) -->
+@if (aberturaCaixaModalOpen()) {
+  <div class="prod-overlay" (click)="fecharModalAberturaCaixa()" role="button" tabindex="0">
+    <div class="prod-form-modal" (click)="$event.stopPropagation()" role="dialog">
+      <div class="prod-form-head">
+        <h3>Abertura de Caixa</h3>
+        <button type="button" class="prod-form-close" (click)="fecharModalAberturaCaixa()"><i class="pi pi-times"></i></button>
+      </div>
+      <form [formGroup]="aberturaCaixaForm" (ngSubmit)="confirmarAberturaCaixa()" class="prod-form-body">
+        <div class="filter-field">
+          <label>Valor de abertura (obrigatório)</label>
+          <input type="text" formControlName="valor_abertura" brlCurrency placeholder="R$ 0,00" class="prod-form-input" inputmode="decimal" />
+        </div>
+        <div class="filter-field">
+          <label>Observação</label>
+          <input type="text" formControlName="observacao" placeholder="Opcional" class="prod-form-input" />
+        </div>
+        @if (aberturaCaixaErro()) { <p class="prod-form-err">{{ aberturaCaixaErro() }}</p> }
+        <div class="prod-form-footer">
+          <button type="button" class="prod-form-btn-sec" (click)="fecharModalAberturaCaixa()">Cancelar</button>
+          <button type="submit" class="prod-form-btn-pri" [disabled]="aberturaCaixaSalvando()">{{ aberturaCaixaSalvando() ? 'Abrindo...' : 'Abrir Caixa' }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Modal Lançamento Manual (sidebar Caixa) -->
+@if (lancamentoManualModalOpen()) {
+  <div class="prod-overlay" (click)="fecharModalLancamentoManual()" role="button" tabindex="0">
+    <div class="prod-form-modal lancamento-manual-modal" (click)="$event.stopPropagation()" role="dialog">
+      <div class="prod-form-head">
+        <h3>Lançamento Manual</h3>
+        <button type="button" class="prod-form-close" (click)="fecharModalLancamentoManual()"><i class="pi pi-times"></i></button>
+      </div>
+      <form [formGroup]="lancamentoManualForm" (ngSubmit)="salvarLancamentoManual()" class="prod-form-body">
+        <div class="filter-field">
+          <label>Descrição</label>
+          <input type="text" formControlName="descricao" placeholder="Ex: Refrigerante lata, Café, Pomada capilar" class="prod-form-input" />
+        </div>
+        <div class="filter-field">
+          <label>Valor (obrigatório)</label>
+          <input type="text" formControlName="valor" brlCurrency placeholder="R$ 0,00" class="prod-form-input" inputmode="decimal" />
+        </div>
+        @if (lancamentoManualErro()) { <p class="prod-form-err">{{ lancamentoManualErro() }}</p> }
+        <div class="prod-form-footer">
+          <button type="button" class="prod-form-btn-sec" (click)="fecharModalLancamentoManual()">Cancelar</button>
+          <button type="submit" class="prod-form-btn-pri" [disabled]="lancamentoManualSalvando()">{{ lancamentoManualSalvando() ? 'Salvando...' : 'Salvar' }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Modal Sangria (sidebar Caixa) -->
+@if (sangriaModalOpen()) {
+  <div class="prod-overlay" (click)="fecharModalSangria()" role="button" tabindex="0">
+    <div class="prod-form-modal" (click)="$event.stopPropagation()" role="dialog">
+      <div class="prod-form-head">
+        <h3>Sangria</h3>
+        <button type="button" class="prod-form-close" (click)="fecharModalSangria()"><i class="pi pi-times"></i></button>
+      </div>
+      <form [formGroup]="sangriaForm" (ngSubmit)="salvarSangria()" class="prod-form-body">
+        <div class="filter-field">
+          <label>Valor (obrigatório)</label>
+          <input type="text" formControlName="valor" brlCurrency placeholder="R$ 0,00" class="prod-form-input" inputmode="decimal" />
+        </div>
+        <div class="filter-field">
+          <label>Observação</label>
+          <input type="text" formControlName="observacao" placeholder="Opcional" class="prod-form-input" />
+        </div>
+        @if (sangriaErro()) { <p class="prod-form-err">{{ sangriaErro() }}</p> }
+        <div class="prod-form-footer">
+          <button type="button" class="prod-form-btn-sec" (click)="fecharModalSangria()">Cancelar</button>
+          <button type="submit" class="prod-form-btn-pri" [disabled]="sangriaSalvando()">{{ sangriaSalvando() ? 'Salvando...' : 'Salvar' }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Modal Encerrar Caixa (sidebar Caixa) -->
+@if (encerrarCaixaModalOpen()) {
+  <div class="prod-overlay" (click)="fecharModalEncerrarCaixa()" role="button" tabindex="0">
+    <div class="prod-form-modal" (click)="$event.stopPropagation()" role="dialog">
+      <div class="prod-form-head">
+        <h3>Encerrar Caixa</h3>
+        <button type="button" class="prod-form-close" (click)="fecharModalEncerrarCaixa()"><i class="pi pi-times"></i></button>
+      </div>
+      <form [formGroup]="encerrarCaixaForm" (ngSubmit)="confirmarEncerrarCaixa()" class="prod-form-body">
+        <div class="filter-field">
+          <label>Valor de fechamento (saldo atual)</label>
+          <input type="text" [value]="'R$ ' + (saldoCaixa() | number:'1.2-2':'pt-BR')" readonly class="prod-form-input readonly" />
+        </div>
+        <div class="filter-field">
+          <label>Observação</label>
+          <input type="text" formControlName="observacao" placeholder="Opcional" class="prod-form-input" />
+        </div>
+        @if (encerrarCaixaErro()) { <p class="prod-form-err">{{ encerrarCaixaErro() }}</p> }
+        <div class="prod-form-footer">
+          <button type="button" class="prod-form-btn-sec" (click)="fecharModalEncerrarCaixa()">Cancelar</button>
+          <button type="submit" class="prod-form-btn-pri prod-form-btn-danger" [disabled]="encerrarCaixaSalvando()">{{ encerrarCaixaSalvando() ? 'Encerrando...' : 'Encerrar Caixa' }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Modal Recebimento - lista de encerrados (sidebar Caixa) -->
+@if (recebimentoListaModalOpen()) {
+  <div class="rec-overlay" (click)="fecharModalRecebimentoLista()" role="button" tabindex="0">
+    <div class="rec-modal rec-modal-lista" (click)="$event.stopPropagation()" role="dialog">
+      <div class="rec-header">
+        <h3>Receber pagamento</h3>
+        <button type="button" class="rec-close" (click)="fecharModalRecebimentoLista()"><i class="pi pi-times"></i></button>
+      </div>
+      <div class="rec-body">
+        @if (carregandoEncerrados()) {
+          <p class="rec-loading">Carregando...</p>
+        } @else if (selectedEncerradoParaRec()) {
+          <div class="rec-confirm-view">
+            <p>Cliente: <strong>{{ selectedEncerradoParaRec()!.nome || 'Cliente' }}</strong></p>
+            <p>Valor: <strong>R$ {{ selectedEncerradoParaRec()!.total | number:'1.2-2':'pt-BR' }}</strong></p>
+            <label>Forma de pagamento</label>
+            <div class="rec-tipos">
+              <button type="button" class="rec-tipo" [class.active]="tipoPagamentoRecebimento() === 'DINHEIRO'" (click)="setTipoPagamentoRecebimento('DINHEIRO')">Dinheiro</button>
+              <button type="button" class="rec-tipo" [class.active]="tipoPagamentoRecebimento() === 'PIX'" (click)="setTipoPagamentoRecebimento('PIX')">Pix</button>
+              <button type="button" class="rec-tipo" [class.active]="tipoPagamentoRecebimento() === 'CARTAO_CREDITO' || tipoPagamentoRecebimento() === 'CARTAO_DEBITO'" (click)="setTipoPagamentoRecebimento('CARTAO_CREDITO')">Cartão</button>
+            </div>
+            @if (tipoPagamentoRecebimento() === 'CARTAO_CREDITO' || tipoPagamentoRecebimento() === 'CARTAO_DEBITO') {
+              <div class="rec-cartao-sub">
+                <button type="button" class="rec-tipo-sub" [class.active]="tipoPagamentoRecebimento() === 'CARTAO_CREDITO'" (click)="setTipoPagamentoRecebimento('CARTAO_CREDITO')">Crédito</button>
+                <button type="button" class="rec-tipo-sub" [class.active]="tipoPagamentoRecebimento() === 'CARTAO_DEBITO'" (click)="setTipoPagamentoRecebimento('CARTAO_DEBITO')">Débito</button>
+              </div>
+            }
+            @if (recebimentoErro()) { <p class="rec-erro">{{ recebimentoErro() }}</p> }
+            <div class="rec-footer">
+              <button type="button" class="rec-btn-sec" (click)="voltarListaEncerrados()">Voltar</button>
+              <button type="button" class="rec-btn-pri" [disabled]="recebimentoCarregando()" (click)="confirmarRecebimentoEncerrado()">
+                {{ recebimentoCarregando() ? 'Salvando...' : 'Confirmar recebimento' }}
+              </button>
+            </div>
+          </div>
+        } @else {
+          <div class="rec-lista-encerrados">
+            @for (item of listaEncerrados(); track item.id_atendimento) {
+              <div class="rec-item-encerrado" (click)="selecionarEncerradoParaRec(item)">
+                <span class="rec-item-nome">{{ item.nome || 'Cliente' }}</span>
+                <span class="rec-item-valor">R$ {{ item.total | number:'1.2-2':'pt-BR' }}</span>
+                <i class="pi pi-chevron-right"></i>
+              </div>
+            }
+            @empty {
+              <p class="rec-empty">Nenhum atendimento aguardando recebimento.</p>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal Atendimentos do dia (ao clicar em um dia do gráfico) -->
+@if (atendimentosDiaModalOpen()) {
+  <div class="atendimentos-dia-overlay" (click)="fecharModalAtendimentosDia()" role="button" tabindex="0" (keydown.escape)="fecharModalAtendimentosDia()">
+    <div class="atendimentos-dia-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="atendimentos-dia-title">
+      <div class="atendimentos-dia-header">
+        <h3 id="atendimentos-dia-title">Atendimentos em {{ formatarDataTituloModal(dataSelecionadaAtendimentos()) }}</h3>
+        <button type="button" class="atendimentos-dia-close" (click)="fecharModalAtendimentosDia()" aria-label="Fechar">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+      <div class="atendimentos-dia-body">
+        @if (carregandoAtendimentosDia()) {
+          <p class="atendimentos-dia-loading">Carregando...</p>
+        } @else {
+          @for (item of listaAtendimentosDia(); track item.id_atendimento) {
+            <div class="atendimentos-dia-item">
+              <div class="atendimentos-dia-card atendimentos-dia-card-clickable" (click)="toggleDetalheAtendimento(item.id_atendimento)" role="button" tabindex="0">
+                <div class="atendimentos-dia-card-icon">
+                  <i class="pi pi-user"></i>
+                </div>
+                <div class="atendimentos-dia-card-info">
+                  <span class="atendimentos-dia-card-nome">{{ item.nome_cliente || 'Cliente' }}</span>
+                  <span class="atendimentos-dia-card-hora">{{ formatarHoraAtendimento(item.data_hora) }}</span>
+                  <span class="atendimentos-dia-card-servico">{{ item.servicos || '—' }}</span>
+                </div>
+                <div class="atendimentos-dia-card-valor">{{ formatarValorAtendimento(item.total) }}</div>
+                <i class="pi atendimentos-dia-card-chevron" [class.pi-chevron-down]="atendimentoExpandidoId() !== item.id_atendimento" [class.pi-chevron-up]="atendimentoExpandidoId() === item.id_atendimento"></i>
+              </div>
+              @if (atendimentoExpandidoId() === item.id_atendimento) {
+                <div class="atendimentos-dia-detalhe">
+                  @if (carregandoDetalheId() === item.id_atendimento) {
+                    <p class="atendimentos-dia-detalhe-loading">Carregando serviços e produtos...</p>
+                  } @else {
+                    @let detalhe = detalheAtendimentoMap()[item.id_atendimento];
+                    @if (detalhe) {
+                      @if (detalhe.servicos && detalhe.servicos.length > 0) {
+                        <div class="atendimentos-dia-detalhe-block">
+                          <strong>Serviços</strong>
+                          <ul>
+                            @for (s of detalhe.servicos; track s.descricao + s.valor) {
+                              <li>{{ s.descricao }} — {{ s.valor | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</li>
+                            }
+                          </ul>
+                        </div>
+                      }
+                      @if (detalhe.produtos && detalhe.produtos.length > 0) {
+                        <div class="atendimentos-dia-detalhe-block">
+                          <strong>Produtos</strong>
+                          <ul>
+                            @for (p of detalhe.produtos; track p.descricao + p.quantidade) {
+                              <li>{{ p.descricao }} — {{ p.quantidade }} x {{ p.valor | currency:'BRL':'symbol':'1.2-2':'pt-BR' }} = {{ p.subtotal | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</li>
+                            }
+                          </ul>
+                        </div>
+                      }
+                      @if ((!detalhe.servicos || detalhe.servicos.length === 0) && (!detalhe.produtos || detalhe.produtos.length === 0)) {
+                        <p class="atendimentos-dia-detalhe-empty">Nenhum serviço ou produto lançado.</p>
+                      }
+                    }
+                  }
+                </div>
+              }
+            </div>
+          }
+          @empty {
+            <p class="atendimentos-dia-empty">Nenhum atendimento neste dia.</p>
+          }
+        }
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal Ver todos os Cabeleireiros -->
+@if (modalVerTodosCabeleireirosOpen()) {
+  <div class="prof-modal-overlay" (click)="fecharModalVerTodosCabeleireiros()" role="button" tabindex="0" (keydown.escape)="fecharModalVerTodosCabeleireiros()">
+    <div class="prof-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="prof-modal-title">
+      <div class="prof-modal-header">
+        <h3 id="prof-modal-title">Cabeleireiros</h3>
+        <button type="button" class="prof-modal-close" (click)="fecharModalVerTodosCabeleireiros()" aria-label="Fechar">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+      <div class="prof-modal-body">
+        <ul class="prof-list prof-list-modal">
+          @for (p of rankingProfissionaisCompleto(); track $index) {
+            <li class="prof-item">
+              <img [src]="avatarUrlNome(p.nome)" [alt]="p.nome" class="prof-avatar" />
+              <div class="prof-info">
+                <span class="prof-nome">{{ p.nome }}</span>
+                <span class="prof-media">{{ p.atendimentos }} {{ p.atendimentos === 1 ? 'atendimento' : 'atendimentos' }}</span>
+              </div>
+              <span class="prof-valor">{{ p.total | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+            </li>
+          }
+          @empty {
+            <li class="prof-empty">Nenhum cabeleireiro cadastrado.</li>
+          }
+        </ul>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal Relatório de Produtos -->
+@if (modalRelatorioProdutosOpen()) {
+  <div class="prod-overlay" (click)="fecharModalRelatorioProdutos()" role="button" tabindex="0">
+    <div class="prod-modal relatorio-modal" (click)="$event.stopPropagation()" role="dialog">
+      <div class="prod-modal-head">
+        <h3>Relatório de Produtos</h3>
+        <button type="button" class="prod-close" (click)="fecharModalRelatorioProdutos()"><i class="pi pi-times"></i></button>
+      </div>
+      <div class="relatorio-filtros">
+        <div class="relatorio-filtro-row">
+          <label>Produto</label>
+          <select class="relatorio-select" [ngModel]="relatorioProdutoId()" (ngModelChange)="relatorioProdutoId.set($event == null || $event === '' ? null : +$event)">
+            <option [ngValue]="null">Todos os produtos</option>
+            @for (p of relatorioProdutosList(); track p.id) {
+              <option [ngValue]="p.id">{{ p.descricao || 'Produto #' + p.id }}</option>
+            }
+          </select>
+        </div>
+        <div class="relatorio-filtro-row">
+          <label>Ativo</label>
+          <select class="relatorio-select" [ngModel]="relatorioAtivo()" (ngModelChange)="relatorioAtivo.set($event)">
+            <option value="">Todos</option>
+            <option value="true">Ativo</option>
+            <option value="false">Inativo</option>
+          </select>
+        </div>
+        <div class="relatorio-botoes">
+          <button type="button" class="relatorio-btn-icon relatorio-btn-pesquisar" (click)="pesquisarRelatorioProdutos()" title="Pesquisar" [disabled]="carregandoRelatorioProdutos()">
+            <i class="pi pi-search"></i>
+          </button>
+          <button type="button" class="relatorio-btn-icon relatorio-btn-visualizar" (click)="visualizarRelatorioProdutos()" title="Visualizar">
+            <i class="pi pi-eye"></i>
+          </button>
+          <button type="button" class="relatorio-btn-icon relatorio-btn-pdf" (click)="imprimirRelatorioProdutosPDF()" title="Imprimir PDF">
+            <i class="pi pi-file-pdf"></i>
+          </button>
+        </div>
+      </div>
+      <div class="relatorio-body">
+        @if (carregandoRelatorioProdutos()) {
+          <p class="relatorio-loading">Carregando produtos...</p>
+        } @else {
+        <table class="relatorio-table">
+          <thead>
+            <tr>
+              <th>Descrição</th>
+              <th class="th-num">Quantidade</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of relatorioProdutosFiltrados(); track p.id) {
+              <tr>
+                <td>{{ p.descricao || '—' }}</td>
+                <td class="td-num">{{ p.estoque }}</td>
+                <td>
+                  <span class="relatorio-status" [class.ativo]="p.ativo !== false" [class.inativo]="p.ativo === false">
+                    {{ p.ativo !== false ? 'Ativo' : 'Inativo' }}
+                  </span>
+                </td>
+              </tr>
+            }
+              @empty {
+              <tr><td colspan="3" class="relatorio-empty">Nenhum produto encontrado com os filtros selecionados.</td></tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal Relatório de Atendimentos -->
+@if (modalRelatorioAtendimentosOpen()) {
+  <div class="prod-overlay" (click)="fecharModalRelatorioAtendimentos()" role="button" tabindex="0">
+    <div class="prod-modal relatorio-modal relatorio-modal-atendimentos" (click)="$event.stopPropagation()" role="dialog">
+      <div class="prod-modal-head">
+        <h3>Relatório de Atendimentos</h3>
+        <button type="button" class="prod-close" (click)="fecharModalRelatorioAtendimentos()"><i class="pi pi-times"></i></button>
+      </div>
+      <form [formGroup]="relatorioAtendimentosForm" class="relatorio-filtros">
+        <div class="relatorio-filtro-row">
+          <label>Data Início</label>
+          <input type="date" formControlName="data_inicio" class="relatorio-input" />
+        </div>
+        <div class="relatorio-filtro-row">
+          <label>Data Final</label>
+          <input type="date" formControlName="data_fim" class="relatorio-input" />
+        </div>
+        <div class="relatorio-filtro-row">
+          <label>Nome</label>
+          <input type="text" formControlName="nome" class="relatorio-input" placeholder="Nome do cliente" />
+        </div>
+        <div class="relatorio-filtro-row">
+          <label>Cabeleireiro</label>
+          <select formControlName="id_cabeleireiro" class="relatorio-select">
+            <option value="">Todos</option>
+            @for (c of cabeleireirosRelatorio(); track c.id) {
+              <option [value]="c.id">{{ c.nome }}</option>
+            }
+          </select>
+        </div>
+        <div class="relatorio-botoes">
+          <button type="button" class="relatorio-btn-icon relatorio-btn-pesquisar" (click)="visualizarRelatorioAtendimentos()" title="Pesquisar" [disabled]="carregandoRelatorioAtendimentos()">
+            <i class="pi pi-search"></i>
+          </button>
+          <button type="button" class="relatorio-btn-icon relatorio-btn-visualizar" (click)="abrirRelatorioAtendimentosNovaAba()" title="Visualizar em nova aba" [disabled]="carregandoRelatorioAtendimentos()">
+            <i class="pi pi-eye"></i>
+          </button>
+          <button type="button" class="relatorio-btn-icon relatorio-btn-pdf" (click)="imprimirRelatorioAtendimentos()" title="Imprimir">
+            <i class="pi pi-print"></i>
+          </button>
+        </div>
+      </form>
+      <div class="relatorio-body">
+        @if (carregandoRelatorioAtendimentos()) {
+          <p class="relatorio-loading">Carregando atendimentos...</p>
+        } @else {
+          <table class="relatorio-table">
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Data início</th>
+                <th>Cabeleireiro</th>
+                <th class="th-num">Valor</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (a of listaRelatorioAtendimentos(); track a.id) {
+                <tr>
+                  <td>{{ a.nome_cliente || '—' }}</td>
+                  <td>{{ a.inicio ? (a.inicio | date:'dd/MM/yyyy HH:mm':'pt-BR') : '—' }}</td>
+                  <td>{{ nomeCabeleireiroRelatorio(a.id_cabeleireiro) }}</td>
+                  <td class="td-num">{{ a.total != null ? ('R$ ' + (a.total | number:'1.2-2':'pt-BR')) : '—' }}</td>
+                  <td>{{ a.status }}</td>
+                </tr>
+              }
+              @empty {
+                <tr><td colspan="5" class="relatorio-empty">Use os filtros e clique em Pesquisar para carregar os atendimentos.</td></tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal Relatório de Agenda -->
+@if (modalRelatorioAgendaOpen()) {
+  <div class="prod-overlay" (click)="fecharModalRelatorioAgenda()" role="button" tabindex="0">
+    <div class="prod-modal relatorio-modal relatorio-modal-atendimentos" (click)="$event.stopPropagation()" role="dialog">
+      <div class="prod-modal-head">
+        <h3>Relatório de Agenda</h3>
+        <button type="button" class="prod-close" (click)="fecharModalRelatorioAgenda()"><i class="pi pi-times"></i></button>
+      </div>
+      <form [formGroup]="relatorioAgendaForm" class="relatorio-filtros">
+        <div class="relatorio-filtro-row">
+          <label>Data Início</label>
+          <input type="date" formControlName="data_inicio" class="relatorio-input" />
+        </div>
+        <div class="relatorio-filtro-row">
+          <label>Data Final</label>
+          <input type="date" formControlName="data_fim" class="relatorio-input" />
+        </div>
+        <div class="relatorio-filtro-row">
+          <label>Nome</label>
+          <input type="text" formControlName="nome" class="relatorio-input" placeholder="Nome do cliente" />
+        </div>
+        <div class="relatorio-filtro-row">
+          <label>Vendedor</label>
+          <select formControlName="id_cabeleireiro" class="relatorio-select">
+            <option value="">Todos</option>
+            @for (c of cabeleireirosRelatorioAgenda(); track c.id) {
+              <option [value]="c.id">{{ c.nome }}</option>
+            }
+          </select>
+        </div>
+        <div class="relatorio-botoes">
+          <button type="button" class="relatorio-btn-icon relatorio-btn-pesquisar" (click)="visualizarRelatorioAgenda()" title="Pesquisar" [disabled]="carregandoRelatorioAgenda()">
+            <i class="pi pi-search"></i>
+          </button>
+          <button type="button" class="relatorio-btn-icon relatorio-btn-visualizar" (click)="abrirRelatorioAgendaNovaAba()" title="Visualizar em nova aba" [disabled]="carregandoRelatorioAgenda()">
+            <i class="pi pi-eye"></i>
+          </button>
+          <button type="button" class="relatorio-btn-icon relatorio-btn-pdf" (click)="imprimirRelatorioAgenda()" title="Imprimir">
+            <i class="pi pi-print"></i>
+          </button>
+        </div>
+      </form>
+      <div class="relatorio-body">
+        @if (carregandoRelatorioAgenda()) {
+          <p class="relatorio-loading">Carregando agenda...</p>
+        } @else {
+          <table class="relatorio-table">
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Data/Hora</th>
+                <th>Vendedor</th>
+                <th>Serviço</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (a of listaRelatorioAgenda(); track a.id) {
+                <tr>
+                  <td>{{ a.nomeCliente || '—' }}</td>
+                  <td>{{ a.data_hora ? (a.data_hora | date:'dd/MM/yyyy HH:mm':'pt-BR') : '—' }}</td>
+                  <td>{{ a.cabeleireiro || '—' }}</td>
+                  <td>{{ a.servico_descricao || '—' }}</td>
+                  <td>{{ a.status || '—' }}</td>
+                </tr>
+              }
+              @empty {
+                <tr><td colspan="5" class="relatorio-empty">Use os filtros e clique em Pesquisar para carregar a agenda.</td></tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal Relatório de Cabeleireiros -->
+@if (modalRelatorioCabeleireirosOpen()) {
+  <div class="prod-overlay" (click)="fecharModalRelatorioCabeleireiros()" role="button" tabindex="0">
+    <div class="prod-modal relatorio-modal relatorio-modal-atendimentos" (click)="$event.stopPropagation()" role="dialog">
+      <div class="prod-modal-head">
+        <h3>Relatório de Cabeleireiros</h3>
+        <button type="button" class="prod-close" (click)="fecharModalRelatorioCabeleireiros()"><i class="pi pi-times"></i></button>
+      </div>
+      <form [formGroup]="relatorioCabeleireirosForm" class="relatorio-filtros">
+        <div class="relatorio-filtro-row">
+          <label>Cabeleireiros</label>
+          <select formControlName="id_cabeleireiro" class="relatorio-select">
+            <option value="">Todos</option>
+            @for (c of cabeleireirosRelatorioCabeleireiros(); track c.id) {
+              <option [value]="c.id">{{ c.nome }}</option>
+            }
+          </select>
+        </div>
+        <div class="relatorio-filtro-row">
+          <label>Data Início</label>
+          <input type="date" formControlName="data_inicio" class="relatorio-input" />
+        </div>
+        <div class="relatorio-filtro-row">
+          <label>Data Final</label>
+          <input type="date" formControlName="data_fim" class="relatorio-input" />
+        </div>
+        <div class="relatorio-botoes">
+          <button type="button" class="relatorio-btn-icon relatorio-btn-pesquisar" (click)="visualizarRelatorioCabeleireiros()" title="Pesquisar" [disabled]="carregandoRelatorioCabeleireiros()">
+            <i class="pi pi-search"></i>
+          </button>
+          <button type="button" class="relatorio-btn-icon relatorio-btn-visualizar" (click)="abrirRelatorioCabeleireirosNovaAba()" title="Visualizar em nova aba" [disabled]="carregandoRelatorioCabeleireiros()">
+            <i class="pi pi-eye"></i>
+          </button>
+          <button type="button" class="relatorio-btn-icon relatorio-btn-pdf" (click)="imprimirRelatorioCabeleireiros()" title="Imprimir">
+            <i class="pi pi-print"></i>
+          </button>
+        </div>
+      </form>
+      <div class="relatorio-body">
+        @if (carregandoRelatorioCabeleireiros()) {
+          <p class="relatorio-loading">Carregando...</p>
+        } @else {
+          <table class="relatorio-table">
+            <thead>
+              <tr>
+                <th>Cabeleireiro</th>
+                <th class="th-num">Atendimentos</th>
+                <th class="th-num">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of listaRelatorioCabeleireiros(); track r.nome) {
+                <tr>
+                  <td>{{ r.nome || '—' }}</td>
+                  <td class="td-num">{{ r.atendimentos ?? 0 }}</td>
+                  <td class="td-num">{{ r.total != null ? ('R$ ' + (r.total | number:'1.2-2':'pt-BR')) : '—' }}</td>
+                </tr>
+              }
+              @empty {
+                <tr><td colspan="3" class="relatorio-empty">Use os filtros e clique em Pesquisar para carregar o relatório.</td></tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal Produtos (sidebar DONO) -->
+@if (modalProdutosOpen()) {
+  <div class="prod-overlay" (click)="fecharModalProdutos()" role="button" tabindex="0">
+    <div class="prod-modal" (click)="$event.stopPropagation()" role="dialog">
+      <div class="prod-modal-head">
+        <h3>Produtos</h3>
+        <button type="button" class="prod-close" (click)="fecharModalProdutos()"><i class="pi pi-times"></i></button>
+      </div>
+      <div class="prod-modal-toolbar">
+        <div class="prod-search-wrap">
+          <i class="pi pi-search"></i>
+          <input type="text" placeholder="Buscar produtos..." [ngModel]="searchProdutoModal()" (ngModelChange)="searchProdutoModal.set($event)" class="prod-search-input" />
+        </div>
+        <button type="button" class="prod-btn-add" (click)="abrirModalNovoProduto()">
+          <i class="pi pi-plus"></i> Cadastrar
+        </button>
+      </div>
+      @if (produtoErro() && !produtoFormModalOpen()) {
+        <p class="prod-err">{{ produtoErro() }}</p>
+      }
+      <div class="prod-modal-body">
+        <table class="prod-table">
+          <thead>
+            <tr>
+              <th class="th-img"></th>
+              <th>Descrição</th>
+              <th class="th-num">Valor</th>
+              <th class="th-num">Estoque</th>
+              <th class="th-actions">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of produtosFiltradosModal(); track p.id) {
+              <tr>
+                <td class="td-img">
+                  @if (produtoImagemUrl(p)) {
+                    <img [src]="produtoImagemUrl(p)" [alt]="p.descricao || 'Produto'" class="prod-row-img" />
+                  } @else {
+                    <span class="prod-row-placeholder"><i class="pi pi-image"></i></span>
+                  }
+                </td>
+                <td>{{ p.descricao || '—' }}</td>
+                <td class="td-num">{{ p.valor_venda | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</td>
+                <td class="td-num">{{ p.estoque }}</td>
+                <td class="td-actions">
+                  <button type="button" class="prod-btn-action" (click)="abrirModalEditarProduto(p)" title="Editar"><i class="pi pi-pencil"></i></button>
+                  <button type="button" class="prod-btn-action danger" (click)="excluirProduto(p)" title="Excluir"><i class="pi pi-trash"></i></button>
+                </td>
+              </tr>
+            }
+            @empty {
+              <tr>
+                <td colspan="5" class="prod-empty">{{ searchProdutoModal().trim() ? 'Nenhum produto encontrado.' : 'Nenhum produto cadastrado.' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal Novo/Editar Produto -->
+@if (produtoFormModalOpen()) {
+  <div class="prod-form-overlay" (click)="fecharModalFormProduto()" role="button" tabindex="0">
+    <div class="prod-form-modal" (click)="$event.stopPropagation()" role="dialog">
+      <div class="prod-form-head">
+        <h3>{{ produtoEditId() != null ? 'Editar Produto' : 'Novo Produto' }}</h3>
+        <button type="button" class="prod-form-close" (click)="fecharModalFormProduto()"><i class="pi pi-times"></i></button>
+      </div>
+      <form [formGroup]="produtoForm" (ngSubmit)="salvarProduto()" class="prod-form-body">
+        <label>Descrição *</label>
+        <input type="text" formControlName="descricao" class="prod-form-input" placeholder="Nome do produto" />
+        <label>Valor de venda (R$) *</label>
+        <input type="text" class="prod-form-input" placeholder="R$ 0,00" [value]="valorVendaMask()" (input)="onValorVendaInput($any($event.target).value)" (blur)="onValorVendaBlur()" />
+        <label>Estoque *</label>
+        <input type="number" formControlName="estoque" min="0" class="prod-form-input" placeholder="0" />
+        <label>Imagem</label>
+        <div class="prod-form-file-wrap">
+          <input type="file" accept="image/*" (change)="onFileProdutoSelectedModal($event)" class="prod-form-file" />
+          <span class="prod-form-file-label prod-form-file-label--orange">IMAGEM</span>
+        </div>
+        @if (produtoForm.get('imagem')?.value) {
+          <p class="prod-form-imagem-preview">Imagem selecionada</p>
+        }
+        @if (produtoErro()) { <p class="prod-form-err">{{ produtoErro() }}</p> }
+        <div class="prod-form-footer">
+          <button type="button" class="prod-form-btn-sec" (click)="fecharModalFormProduto()">Cancelar</button>
+          <button type="submit" class="prod-form-btn-pri" [disabled]="produtoSalvando()">{{ produtoSalvando() ? 'Salvando...' : 'Salvar' }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Modal Novo Cliente (header + Cliente): apenas Nome, Salvar e Cancelar -->
+@if (modalNovoClienteOpen()) {
+  <div class="prod-form-overlay" (click)="fecharModalNovoCliente()" role="button" tabindex="0">
+    <div class="prod-form-modal" (click)="$event.stopPropagation()" role="dialog">
+      <div class="prod-form-head">
+        <h3>Novo cliente</h3>
+        <button type="button" class="prod-form-close" (click)="fecharModalNovoCliente()"><i class="pi pi-times"></i></button>
+      </div>
+      <form [formGroup]="clienteForm" (ngSubmit)="salvarCliente()" class="prod-form-body">
+        <label>Nome</label>
+        <input type="text" formControlName="nome" class="prod-form-input" placeholder="Nome do cliente" />
+        @if (clienteErro()) { <p class="prod-form-err">{{ clienteErro() }}</p> }
+        <div class="prod-form-footer">
+          <button type="button" class="prod-form-btn-sec" (click)="fecharModalNovoCliente()">Cancelar</button>
+          <button type="submit" class="prod-form-btn-pri" [disabled]="clienteSalvando()">{{ clienteSalvando() ? 'Salvando...' : 'Salvar' }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Modal Serviços (sidebar DONO) -->
+@if (modalServicosOpen()) {
+  <div class="prod-overlay" (click)="fecharModalServicos()" role="button" tabindex="0">
+    <div class="prod-modal" (click)="$event.stopPropagation()" role="dialog">
+      <div class="prod-modal-head">
+        <h3>Serviços</h3>
+        <button type="button" class="prod-close" (click)="fecharModalServicos()"><i class="pi pi-times"></i></button>
+      </div>
+      <div class="prod-modal-toolbar">
+        <div class="prod-search-wrap">
+          <i class="pi pi-search"></i>
+          <input type="text" placeholder="Buscar serviços..." [ngModel]="searchServicoModal()" (ngModelChange)="searchServicoModal.set($event)" class="prod-search-input" />
+        </div>
+        <button type="button" class="prod-btn-add" (click)="abrirModalNovoServico()">
+          <i class="pi pi-plus"></i> Cadastrar
+        </button>
+      </div>
+      @if (servicoErro() && !servicoFormModalOpen()) {
+        <p class="prod-err">{{ servicoErro() }}</p>
+      }
+      <div class="prod-modal-body">
+        <table class="prod-table">
+          <thead>
+            <tr>
+              <th class="th-img"></th>
+              <th>Descrição</th>
+              <th class="th-num">Valor</th>
+              <th class="th-actions">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (s of servicosFiltrados(); track s.id) {
+              <tr>
+                <td class="td-img">
+                  @if (servicoImagemUrl(s)) {
+                    <img [src]="servicoImagemUrl(s)" [alt]="s.descricao || 'Serviço'" class="prod-row-img" />
+                  } @else {
+                    <span class="prod-row-placeholder"><i class="pi pi-wrench"></i></span>
+                  }
+                </td>
+                <td>{{ s.descricao || '—' }}</td>
+                <td class="td-num">{{ s.valor | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</td>
+                <td class="td-actions">
+                  <button type="button" class="prod-btn-action" (click)="abrirModalEditarServico(s)" title="Editar"><i class="pi pi-pencil"></i></button>
+                  <button type="button" class="prod-btn-action danger" (click)="excluirServico(s)" title="Excluir"><i class="pi pi-trash"></i></button>
+                </td>
+              </tr>
+            }
+            @empty {
+              <tr>
+                <td colspan="4" class="prod-empty">{{ searchServicoModal().trim() ? 'Nenhum serviço encontrado.' : 'Nenhum serviço cadastrado.' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal Novo/Editar Serviço -->
+@if (servicoFormModalOpen()) {
+  <div class="prod-form-overlay" (click)="fecharModalFormServico()" role="button" tabindex="0">
+    <div class="prod-form-modal" (click)="$event.stopPropagation()" role="dialog">
+      <div class="prod-form-head">
+        <h3>{{ servicoEditId() != null ? 'Editar Serviço' : 'Novo Serviço' }}</h3>
+        <button type="button" class="prod-form-close" (click)="fecharModalFormServico()"><i class="pi pi-times"></i></button>
+      </div>
+      <form [formGroup]="servicoForm" (ngSubmit)="salvarServico()" class="prod-form-body">
+        <label>Descrição *</label>
+        <input type="text" formControlName="descricao" class="prod-form-input" placeholder="Nome do serviço" />
+        <label>Valor (R$) *</label>
+        <input type="number" formControlName="valor" step="0.01" min="0" class="prod-form-input" placeholder="0,00" />
+        <label>Imagem</label>
+        <div class="prod-form-file-wrap">
+          <input type="file" accept="image/*" (change)="onFileServicoSelected($event)" class="prod-form-file" />
+          <span class="prod-form-file-label">Enviar imagem</span>
+        </div>
+        @if (servicoForm.get('imagem')?.value) {
+          <p class="prod-form-imagem-preview">Imagem selecionada</p>
+        }
+        @if (servicoErro()) { <p class="prod-form-err">{{ servicoErro() }}</p> }
+        <div class="prod-form-footer">
+          <button type="button" class="prod-form-btn-sec" (click)="fecharModalFormServico()">Cancelar</button>
+          <button type="submit" class="prod-form-btn-pri" [disabled]="servicoSalvando()">{{ servicoSalvando() ? 'Salvando...' : 'Salvar' }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Modal Agenda (sidebar DONO): calendário + lista + pesquisa + botão cadastrar -->
+@if (modalAgendaOpen()) {
+  <div class="prod-overlay" (click)="fecharModalAgenda()" role="button" tabindex="0">
+    <div class="agenda-modal-sidebar" (click)="$event.stopPropagation()" role="dialog">
+      <div class="prod-modal-head">
+        <h3>Agenda</h3>
+        <button type="button" class="prod-close" (click)="fecharModalAgenda()"><i class="pi pi-times"></i></button>
+      </div>
+      <div class="agenda-modal-toolbar">
+        <div class="prod-search-wrap">
+          <i class="pi pi-search"></i>
+          <input type="text" placeholder="Pesquisar cliente..." [ngModel]="agendaSearchCliente()" (ngModelChange)="agendaSearchCliente.set($event)" class="prod-search-input" />
+        </div>
+        <div class="agenda-modal-mes-wrap">
+          <label>Mês</label>
+          <input type="month" [ngModel]="agendaModalMes()" (ngModelChange)="agendaModalMes.set($event); carregarAgendaModal()" class="agenda-mes-input" />
+        </div>
+        <button type="button" class="prod-btn-add" (click)="abrirModalNovoAgendamento()">
+          <i class="pi pi-plus"></i> Cadastrar
+        </button>
+      </div>
+      <div class="agenda-modal-list">
+        <table class="prod-table agenda-table-inline">
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>Serviço</th>
+              <th>Cabeleireiro</th>
+              <th>Data/Hora</th>
+              <th class="agenda-th-acoes">AÇÕES</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (a of agendaListaFiltrada(); track a.id) {
+              <tr>
+                <td>{{ a.nomeCliente || '—' }}</td>
+                <td>{{ a.servico_descricao || '—' }}</td>
+                <td>{{ a.cabeleireiro || '—' }}</td>
+                <td>{{ formatarDataHoraAgenda(a.data_hora) }}</td>
+                <td class="agenda-td-acoes">
+                  <button type="button" class="agenda-btn-acao agenda-btn-editar" (click)="abrirModalEditarAgendamento(a)" title="Editar">
+                    <i class="pi pi-pencil"></i>
+                  </button>
+                  <button type="button" class="agenda-btn-acao agenda-btn-excluir" (click)="excluirAgendamento(a)" title="Excluir">
+                    <i class="pi pi-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            }
+            @empty {
+              <tr>
+                <td colspan="5" class="prod-empty">Nenhum agendamento no mês.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal Novo Agendamento -->
+@if (modalNovoAgendamentoOpen()) {
+  <div class="prod-form-overlay" (click)="fecharModalNovoAgendamento()" role="button" tabindex="0">
+    <div class="prod-form-modal" (click)="$event.stopPropagation()" role="dialog">
+      <div class="prod-form-head">
+        <h3>{{ agendaEditId() ? 'Editar agendamento' : 'Novo agendamento' }}</h3>
+        <button type="button" class="prod-form-close" (click)="fecharModalNovoAgendamento()"><i class="pi pi-times"></i></button>
+      </div>
+      <form [formGroup]="agendamentoForm" (ngSubmit)="salvarAgendamento()" class="prod-form-body">
+        <label>Cliente *</label>
+        <input type="text" formControlName="nome_cliente" class="prod-form-input" placeholder="Nome do cliente" />
+        <label>Data *</label>
+        <input type="date" formControlName="data" class="prod-form-input" />
+        <label>Hora *</label>
+        <input type="time" formControlName="hora" class="prod-form-input" />
+        <label>Serviço</label>
+        <select formControlName="id_servico" class="prod-form-input">
+          <option [ngValue]="null">— Selecionar —</option>
+          @for (s of servicosListAgenda(); track s.id) {
+            <option [ngValue]="s.id">{{ s.descricao }} — {{ s.valor | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</option>
+          }
+        </select>
+        <label>Cabeleireiro</label>
+        <select formControlName="id_cabeleireiro" class="prod-form-input">
+          <option [ngValue]="null">— Selecionar —</option>
+          @for (c of cabeleireiros(); track c.id) {
+            <option [ngValue]="c.id">{{ c.nome }}</option>
+          }
+        </select>
+        <label>Observação</label>
+        <input type="text" formControlName="observacao" class="prod-form-input" placeholder="Opcional" />
+        @if (agendamentoErro()) { <p class="prod-form-err">{{ agendamentoErro() }}</p> }
+        <div class="prod-form-footer">
+          <button type="button" class="prod-form-btn-sec" (click)="fecharModalNovoAgendamento()">Cancelar</button>
+          <button type="submit" class="prod-form-btn-pri" [disabled]="agendamentoSalvando()">{{ agendamentoSalvando() ? 'Salvando...' : 'Salvar' }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Modal Configurações (Dados Pessoais + Segurança e Senha) -->
+@if (configModalOpen()) {
+  <div class="config-overlay" (click)="fecharModalConfiguracoes()" role="button" tabindex="0" (keydown.escape)="fecharModalConfiguracoes()">
+    <div class="config-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+      <div class="config-header">
+        <h3>Configurações</h3>
+        <button type="button" class="config-close" (click)="fecharModalConfiguracoes()" aria-label="Fechar"><i class="pi pi-times"></i></button>
+      </div>
+      <div class="config-body">
+        @if (configSubView() === 'menu') {
+          <button type="button" class="config-menu-item" (click)="abrirConfigDadosPessoais()">
+            <i class="pi pi-user"></i>
+            <span>Dados Pessoais</span>
+            <i class="pi pi-chevron-right"></i>
+          </button>
+          <button type="button" class="config-menu-item" (click)="abrirConfigSegurancaSenha()">
+            <i class="pi pi-lock"></i>
+            <span>Segurança e Senha</span>
+            <i class="pi pi-chevron-right"></i>
+          </button>
+        }
+        @if (configSubView() === 'dados') {
+          <div class="config-form-wrap">
+            <button type="button" class="config-back" (click)="configVoltarMenu()"><i class="pi pi-arrow-left"></i> Voltar</button>
+            <h4>Dados Pessoais</h4>
+            <form [formGroup]="configDadosForm" (ngSubmit)="salvarConfigDadosPessoais()">
+              <label>Nome *</label>
+              <input type="text" formControlName="nome" class="prod-form-input" placeholder="Seu nome" />
+              <p class="config-readonly">Login: {{ configUsuarioLogin() }}</p>
+              <p class="config-readonly">Perfil: {{ configUsuarioPerfil() }}</p>
+              @if (configDadosErro()) { <p class="prod-form-err">{{ configDadosErro() }}</p> }
+              <div class="prod-form-footer">
+                <button type="button" class="prod-form-btn-sec" (click)="configVoltarMenu()">Cancelar</button>
+                <button type="submit" class="prod-form-btn-pri" [disabled]="configDadosLoading()">{{ configDadosLoading() ? 'Salvando...' : 'Salvar' }}</button>
+              </div>
+            </form>
+          </div>
+        }
+        @if (configSubView() === 'senha') {
+          <div class="config-form-wrap">
+            <button type="button" class="config-back" (click)="configVoltarMenu()"><i class="pi pi-arrow-left"></i> Voltar</button>
+            <h4>Segurança e Senha</h4>
+            <form [formGroup]="configSenhaForm" (ngSubmit)="salvarConfigSenha()">
+              <label>Senha atual *</label>
+              <input type="password" formControlName="senha_atual" class="prod-form-input" placeholder="Senha atual" />
+              <label>Nova senha *</label>
+              <input type="password" formControlName="nova_senha" class="prod-form-input" placeholder="Mínimo 4 caracteres" />
+              <label>Confirmar nova senha *</label>
+              <input type="password" formControlName="confirmar" class="prod-form-input" placeholder="Repita a nova senha" />
+              @if (configSenhaErro()) { <p class="prod-form-err">{{ configSenhaErro() }}</p> }
+              <div class="prod-form-footer">
+                <button type="button" class="prod-form-btn-sec" (click)="configVoltarMenu()">Cancelar</button>
+                <button type="submit" class="prod-form-btn-pri" [disabled]="configSenhaLoading()">{{ configSenhaLoading() ? 'Alterando...' : 'Alterar senha' }}</button>
+              </div>
+            </form>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

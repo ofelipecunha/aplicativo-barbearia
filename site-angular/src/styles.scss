@@ -1,0 +1,25 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #312e38;
+  color: #fff;
+  font-family: 'Roboto Slab', serif;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: #ff9000;
+  text-decoration: none;
+  &:hover {
+    opacity: 0.9;
+  }
+}

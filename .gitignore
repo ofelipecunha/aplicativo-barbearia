@@ -1,0 +1,54 @@
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+build/
+*.iml
+*.ipr
+*.iws
+
+# Android
+android/.gradle/
+android/local.properties
+android/**/gradle-wrapper.jar
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# iOS
+ios/Pods/
+ios/**/.symlinks/
+ios/Flutter/Flutter.framework
+*.mode1v3
+*.pbxuser
+*.xcuserstate
+
+# Backend / Go
+backend/uploads/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc
+*.log
+*.tmp

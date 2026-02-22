@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["dashboard-wrapper.component.ts"],
+  "sourcesContent": [":host { display: block; width: 100%; height: 100%; }"],
+  "mappings": ";AAAA;AAAQ,WAAA;AAAgB,SAAA;AAAa,UAAA;;",
+  "names": []
+}

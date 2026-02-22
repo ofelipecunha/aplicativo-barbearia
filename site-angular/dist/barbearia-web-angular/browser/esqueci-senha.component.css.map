@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/pages/esqueci-senha/esqueci-senha.component.scss"],
+  "sourcesContent": [".layout {\r\n  min-height: 100vh;\r\n  display: flex;\r\n  align-items: stretch;\r\n}\r\n\r\n.content {\r\n  display: flex;\r\n  flex-direction: column;\r\n  align-items: center;\r\n  justify-content: center;\r\n  width: 100%;\r\n  max-width: 700px;\r\n}\r\n\r\n.background {\r\n  flex: 1;\r\n  background: linear-gradient(135deg, #232129 0%, #312e38 50%, #1a191e 100%);\r\n}\r\n\r\n.box {\r\n  width: 340px;\r\n  text-align: center;\r\n\r\n  .logo {\r\n    max-width: 200px;\r\n    margin-bottom: 24px;\r\n  }\r\n\r\n  h1 {\r\n    margin-bottom: 16px;\r\n    font-size: 1.5rem;\r\n  }\r\n\r\n  p {\r\n    color: #999;\r\n    margin-bottom: 24px;\r\n  }\r\n\r\n  .btn {\r\n    margin-bottom: 24px;\r\n  }\r\n\r\n  .link.primary {\r\n    display: inline-flex;\r\n    align-items: center;\r\n    gap: 8px;\r\n    color: #ff9000;\r\n  }\r\n}\r\n"],
+  "mappings": ";AAAA,CAAA;AACE,cAAA;AACA,WAAA;AACA,eAAA;;AAGF,CAAA;AACE,WAAA;AACA,kBAAA;AACA,eAAA;AACA,mBAAA;AACA,SAAA;AACA,aAAA;;AAGF,CAAA;AACE,QAAA;AACA;IAAA;MAAA,MAAA;MAAA,QAAA,EAAA;MAAA,QAAA,GAAA;MAAA,QAAA;;AAGF,CAAA;AACE,SAAA;AACA,cAAA;;AAEA,CAJF,IAIE,CAAA;AACE,aAAA;AACA,iBAAA;;AAGF,CATF,IASE;AACE,iBAAA;AACA,aAAA;;AAGF,CAdF,IAcE;AACE,SAAA;AACA,iBAAA;;AAGF,CAnBF,IAmBE,CAAA;AACE,iBAAA;;AAGF,CAvBF,IAuBE,CAAA,IAAA,CAAA;AACE,WAAA;AACA,eAAA;AACA,OAAA;AACA,SAAA;;",
+  "names": []
+}

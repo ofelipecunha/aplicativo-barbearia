@@ -1,0 +1,80 @@
+<div class="cadastro-page">
+  <!-- Lado esquerdo: formulário -->
+  <section class="cadastro-left">
+    <div class="cadastro-panel">
+      <div class="cadastro-header">
+        <img src="/assets/logoWl.png" alt="Logo" class="cadastro-logo-img" />
+        <h1>Wender Barbearia</h1>
+        <p class="cadastro-subtitle">Seu visual, nosso compromisso.</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="field">
+          <label for="nome">Nome completo</label>
+          <div class="input-wrap">
+            <i class="pi pi-user"></i>
+            <input id="nome" type="text" formControlName="nome" placeholder="Digite seu nome" autocomplete="name" />
+          </div>
+          @if (form.get('nome')?.invalid && form.get('nome')?.touched) {
+            <small class="error">Nome obrigatório</small>
+          }
+        </div>
+        <div class="field">
+          <label for="login">Login</label>
+          <div class="input-wrap">
+            <i class="pi pi-envelope"></i>
+            <input id="login" type="text" formControlName="login" placeholder="Digite seu login" autocomplete="username" />
+          </div>
+          @if (form.get('login')?.invalid && form.get('login')?.touched) {
+            <small class="error">Digite seu login</small>
+          }
+        </div>
+        <div class="field">
+          <label for="perfil">Perfil</label>
+          <div class="input-wrap select-wrap">
+            <i class="pi pi-id-card"></i>
+            <select id="perfil" formControlName="perfil">
+              <option value="">Selecione seu perfil</option>
+              <option value="RECEPCIONISTA">RECEPCIONISTA</option>
+              <option value="CABELEIREIRO">CABELEIREIRO</option>
+            </select>
+          </div>
+          @if (form.get('perfil')?.invalid && form.get('perfil')?.touched) {
+            <small class="error">Selecione um perfil</small>
+          }
+        </div>
+        <div class="field">
+          <label for="senha">Senha</label>
+          <div class="input-wrap">
+            <i class="pi pi-lock"></i>
+            <input id="senha" type="password" formControlName="senha" placeholder="Crie uma senha forte" autocomplete="new-password" />
+          </div>
+          @if (form.get('senha')?.invalid && form.get('senha')?.touched) {
+            <small class="error">Mínimo 6 caracteres</small>
+          }
+        </div>
+
+        @if (errorMessage()) {
+          <div class="error-msg">{{ errorMessage() }}</div>
+        }
+        <button type="submit" class="btn-submit" [disabled]="loading">
+          @if (loading) {
+            <span class="spinner"></span>
+          } @else {
+            Criar conta<i class="pi pi-arrow-right"></i>
+          }
+        </button>
+      </form>
+
+      <p class="cadastro-login">
+        Já possui uma conta? <a routerLink="/login">Entrar</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- Lado direito: imagem -->
+  <section class="cadastro-right">
+    <div class="cadastro-promo-overlay"></div>
+    <div class="cadastro-promo-content"></div>
+  </section>
+</div>
