@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "scripts": {
     "ng": "ng",
-    "start": "npx ng serve",
-    "build": "npx ng build",
-    "build:prod": "npx ng build --configuration=production",
-    "build:render": "node scripts/set-env.js && npx ng build --configuration=production",
-    "watch": "npx ng build --watch --configuration development"
+    "start": "node node_modules/@angular/cli/bin/ng.js serve",
+    "build": "node node_modules/@angular/cli/bin/ng.js build",
+    "build:prod": "node node_modules/@angular/cli/bin/ng.js build --configuration=production",
+    "build:render": "node scripts/set-env.js && node node_modules/@angular/cli/bin/ng.js build --configuration=production",
+    "watch": "node node_modules/@angular/cli/bin/ng.js build --watch --configuration development"
   },
   "private": true,
   "dependencies": {
