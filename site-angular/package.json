@@ -1,6 +1,9 @@
 {
   "name": "barbearia-web-angular",
   "version": "0.1.0",
+  "overrides": {
+    "y18n": "4.0.3"
+  },
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
