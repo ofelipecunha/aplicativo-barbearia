@@ -57,8 +57,8 @@ postgresql://barbearia_db_5106_user:1QlweuNPe2Ygzn078zAChac3zXwzsa3a@dpg-d6kcq0d
    - **Branch:** `main`.
    - **Root Directory:** `site-angular`.
    - **Build Command:**  
-     `npm install && chmod +x node_modules/.bin/ng && npm run build`  
-     (para usar API_URL no build: `npm install && chmod +x node_modules/.bin/ng && npm run build:render`)
+     `npm ci && chmod +x node_modules/.bin/ng && npm run build`  
+     (para usar API_URL: `npm ci && chmod +x node_modules/.bin/ng && npm run build:render`)
    - **Publish Directory:**  
      `dist/barbearia-web-angular/browser`  
      (se não existir `browser`, use apenas `dist/barbearia-web-angular`).
@@ -67,10 +67,10 @@ postgresql://barbearia_db_5106_user:1QlweuNPe2Ygzn078zAChac3zXwzsa3a@dpg-d6kcq0d
 
    | Key           | Value |
    |---------------|--------|
-   | `NODE_VERSION` | `18` |
+   | `NODE_VERSION` | `20` |
    | `API_URL`     | URL do backend (ex: `https://barbearia-api.onrender.com`) **sem barra no final**. |
 
-   **Importante:** `NODE_VERSION=18` evita erros de módulos (yargs/y18n) no Node 22.
+   **Importante:** use `NODE_VERSION=20` (LTS); Node 22 costuma dar erro com y18n no build.
 
 6. Clique em **"Create Static Site"**.
 7. Aguarde o build. A URL do site será algo como:  
@@ -101,9 +101,10 @@ No **site**, o login e todas as chamadas vão para a API usando a `API_URL` defi
 
 ## Problemas comuns
 
-- **Build do site falha (Permission denied, Cannot find module build/index.cjs, y18n):**  
-  1. **Build Command:** `npm install && chmod +x node_modules/.bin/ng && npm run build`.  
-  2. **Node 18:** no serviço **barbearia-web** → **Environment**, adicione **`NODE_VERSION`** = **`18`**. O Render usa Node 22 por padrão; com Node 18 o build do Angular costuma concluir sem esses erros.
+- **Build do site falha (Permission denied, Cannot find module build/..., y18n):**  
+  1. **Build Command:** `npm ci && chmod +x node_modules/.bin/ng && npm run build` (use **npm ci** para instalação igual ao lock).  
+  2. **Node 20:** em **Environment** do **barbearia-web**, defina **`NODE_VERSION`** = **`20`**.  
+  3. Garanta que **package-lock.json** do `site-angular` está commitado.
 - **API não conecta no banco:** confira se `DATABASE_URL` (ou PGHOST/PGPORT/etc.) está correto e se o banco está na mesma região.
 - **Site não carrega:** verifique se **Publish Directory** é `dist/barbearia-web-angular/browser` (ou o que o `ng build` gerar).
 - **Erro de CORS no navegador:** confira se `CORS_ORIGIN` no backend é exatamente a URL do site (com `https://`, sem barra no final).
