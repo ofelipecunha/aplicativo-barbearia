@@ -15,7 +15,7 @@ import 'api_config_host_io.dart'
 /// - Android Emulator: 10.0.2.2 (alias para localhost do host)
 /// - Celular na mesma WiFi (iPhone como teste): baseUrlOverride = 'http://IP_DO_MAC:8080'
 ///   (veja iPhone_celular_teste.md)
-const String baseUrlOverride = '';
+const String baseUrlOverride = 'http://192.168.1.11:8080';
 
 /// URL do Railway. Em release (APK), o app usa esta URL automaticamente.
 const String productionApiUrl = 'https://barbearia-app-v429.onrender.com';

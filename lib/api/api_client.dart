@@ -583,7 +583,32 @@ class ApiClient {
     await addFila(idCliente);
   }
 
-  static Future<void> addFila(int idCliente, {int? idAgendamento}) async {
+  /// Atualiza um agendamento (ex.: status ATENDIDO ou CANCELADO). PATCH /api/agendamentos/:id
+  static Future<Map<String, dynamic>> updateAgendamento(int id, {String? status}) async {
+    if (removerDemoUseDemoData) {
+      return RemoverDemoData.updateAgendamento(id, status: status);
+    }
+    final body = <String, dynamic>{};
+    if (status != null) body['status'] = status;
+    final res = await http.patch(
+      Uri.parse('$apiBase/agendamentos/$id'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(body),
+    );
+    if (res.statusCode >= 200 && res.statusCode < 300) {
+      final decoded = jsonDecode(res.body);
+      return decoded is Map ? Map<String, dynamic>.from(decoded) : <String, dynamic>{};
+    }
+    String msg = 'Erro ao atualizar agendamento';
+    try {
+      final b = jsonDecode(res.body);
+      if (b is Map && b['error'] != null) msg = b['error'].toString();
+    } catch (_) {}
+    throw Exception(msg);
+  }
+
+  /// Insere cliente na fila. Retorna o objeto fila criado (com id) para abrir atendimento.
+  static Future<Map<String, dynamic>> addFila(int idCliente, {int? idAgendamento}) async {
     if (removerDemoUseDemoData) return RemoverDemoData.addFila(idCliente, idAgendamento: idAgendamento);
     final body = <String, dynamic>{"id_cliente": idCliente};
     if (idAgendamento != null) body["id_agendamento"] = idAgendamento;
@@ -595,6 +620,8 @@ class ApiClient {
     if (res.statusCode < 200 || res.statusCode >= 300) {
       throw Exception('Erro ao inserir na fila: ${res.statusCode}');
     }
+    final decoded = jsonDecode(res.body);
+    return decoded is Map ? Map<String, dynamic>.from(decoded) : <String, dynamic>{};
   }
 
   // CAIXA (modelo caixa_movimento: abertura/fechamento)

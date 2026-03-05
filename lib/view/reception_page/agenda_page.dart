@@ -10,10 +10,19 @@ import 'package:barbearia/view/home_page/components/size_config.dart';
 class AgendaPage extends StatefulWidget {
   /// Quando informado (ex.: perfil CABELEIREIRO), a agenda mostra apenas agendamentos deste cabeleireiro.
   final int? idCabeleireiro;
+
   /// Quando false (ex.: agenda como aba no BarberHome), não exibe seta de voltar — evita pop que deixa tela preta.
   final bool showBackButton;
 
-  const AgendaPage({Key? key, this.idCabeleireiro, this.showBackButton = true}) : super(key: key);
+  /// Chamado após marcar agendamento como ATENDIDO e inserir na fila. Recebe id da fila e nome do cliente para abrir tela de atender (perfil Cabeleireiro).
+  final void Function(int idFila, String nomeCliente)? onMarcarAtendido;
+
+  const AgendaPage({
+    Key? key,
+    this.idCabeleireiro,
+    this.showBackButton = true,
+    this.onMarcarAtendido,
+  }) : super(key: key);
 
   @override
   State<AgendaPage> createState() => _AgendaPageState();
@@ -27,6 +36,7 @@ class _AgendaPageState extends State<AgendaPage> {
   CalendarFormat _calendarFormat = CalendarFormat.twoWeeks;
 
   List<Map<String, dynamic>> _agendamentosDoDia = [];
+
   /// Agendamentos por dia (chave yyyy-mm-dd) para marcar dias com agendamento em verde.
   Map<String, List<Map<String, dynamic>>> _agendamentosPorDia = {};
   bool _loading = false;
@@ -39,7 +49,8 @@ class _AgendaPageState extends State<AgendaPage> {
   void initState() {
     super.initState();
     _selectedDay = _focusedDay;
-    _searchCtrl.addListener(() => setState(() => _searchQuery = _searchCtrl.text.trim()));
+    _searchCtrl.addListener(
+        () => setState(() => _searchQuery = _searchCtrl.text.trim()));
     initializeDateFormatting('pt_BR', null);
     _carregarAgendamentos(_selectedDay!);
     _carregarAgendamentosDoMes(_focusedDay);
@@ -57,7 +68,8 @@ class _AgendaPageState extends State<AgendaPage> {
       _error = null;
     });
     try {
-      final lista = await ApiClient.listAgendamentos(day, idCabeleireiro: widget.idCabeleireiro);
+      final lista = await ApiClient.listAgendamentos(day,
+          idCabeleireiro: widget.idCabeleireiro);
       if (!mounted) return;
       setState(() {
         _agendamentosDoDia = lista;
@@ -80,7 +92,8 @@ class _AgendaPageState extends State<AgendaPage> {
     for (var d = start.day; d <= end.day; d++) {
       final day = DateTime(anyDayInMonth.year, anyDayInMonth.month, d);
       futures.add(
-        ApiClient.listAgendamentos(day, idCabeleireiro: widget.idCabeleireiro).then((list) {
+        ApiClient.listAgendamentos(day, idCabeleireiro: widget.idCabeleireiro)
+            .then((list) {
           if (list.isNotEmpty) result[_key(day)] = list;
         }),
       );
@@ -115,7 +128,8 @@ class _AgendaPageState extends State<AgendaPage> {
     final c = a['cliente'];
     if (c is Map) {
       final n = c['nome'] ?? c['Nome'];
-      if (n != null && n.toString().trim().isNotEmpty) return n.toString().trim();
+      if (n != null && n.toString().trim().isNotEmpty)
+        return n.toString().trim();
     }
     return a['nome']?.toString().trim() ?? 'Cliente';
   }
@@ -133,12 +147,6 @@ class _AgendaPageState extends State<AgendaPage> {
     if (dh is String) dt = DateTime.tryParse(dh);
     if (dt == null) return '';
     return '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
-  }
-
-  String _getCabeleireiroNome(Map<String, dynamic> a) {
-    final cab = a['cabeleireiro'];
-    if (cab is Map && cab['nome'] != null) return cab['nome'].toString();
-    return a['cabeleireiro_nome']?.toString() ?? '—';
   }
 
   @override
@@ -221,7 +229,8 @@ class _AgendaPageState extends State<AgendaPage> {
         decoration: InputDecoration(
           hintText: "Buscar por nome...",
           hintStyle: TextStyle(color: AppColors.loginTextMuted, fontSize: 15),
-          prefixIcon: Icon(Icons.search, color: AppColors.loginTextMuted, size: 22),
+          prefixIcon:
+              Icon(Icons.search, color: AppColors.loginTextMuted, size: 22),
           filled: true,
           fillColor: AppColors.loginInputBackground,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
@@ -231,9 +240,11 @@ class _AgendaPageState extends State<AgendaPage> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: AppColors.loginOrange, width: 1.5),
+            borderSide:
+                const BorderSide(color: AppColors.loginOrange, width: 1.5),
           ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         ),
       ),
     );
@@ -263,12 +274,15 @@ class _AgendaPageState extends State<AgendaPage> {
         },
         daysOfWeekHeight: 14,
         daysOfWeekStyle: DaysOfWeekStyle(
-          weekdayStyle: TextStyle(color: AppColors.loginTextMuted, fontSize: 11),
-          weekendStyle: TextStyle(color: AppColors.loginTextMuted, fontSize: 11),
+          weekdayStyle:
+              TextStyle(color: AppColors.loginTextMuted, fontSize: 11),
+          weekendStyle:
+              TextStyle(color: AppColors.loginTextMuted, fontSize: 11),
         ),
         calendarStyle: CalendarStyle(
           defaultTextStyle: const TextStyle(color: Colors.white, fontSize: 14),
-          weekendTextStyle: TextStyle(color: AppColors.loginTextMuted.withOpacity(0.7), fontSize: 14),
+          weekendTextStyle: TextStyle(
+              color: AppColors.loginTextMuted.withOpacity(0.7), fontSize: 14),
           selectedDecoration: BoxDecoration(
             color: AppColors.loginOrange,
             shape: BoxShape.circle,
@@ -280,31 +294,38 @@ class _AgendaPageState extends State<AgendaPage> {
               ),
             ],
           ),
-          selectedTextStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          selectedTextStyle:
+              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           todayDecoration: BoxDecoration(
             color: AppColors.loginOrange.withOpacity(0.3),
             shape: BoxShape.circle,
           ),
-          todayTextStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          todayTextStyle:
+              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           markerDecoration: BoxDecoration(
             color: Colors.green.shade400,
             shape: BoxShape.circle,
           ),
           markersMaxCount: 1,
-          outsideTextStyle: TextStyle(color: AppColors.loginTextMuted.withOpacity(0.6), fontSize: 14),
+          outsideTextStyle: TextStyle(
+              color: AppColors.loginTextMuted.withOpacity(0.6), fontSize: 14),
         ),
         headerStyle: HeaderStyle(
           formatButtonVisible: true,
           formatButtonShowsNext: false,
           titleTextFormatter: (date, _) => DateFormat('MM/yyyy').format(date),
-          titleTextStyle: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+          titleTextStyle: const TextStyle(
+              color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
           formatButtonDecoration: BoxDecoration(
             color: AppColors.loginOrange,
             borderRadius: BorderRadius.circular(8),
           ),
-          formatButtonTextStyle: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
-          leftChevronIcon: const Icon(Icons.chevron_left, color: Colors.white, size: 24),
-          rightChevronIcon: const Icon(Icons.chevron_right, color: Colors.white, size: 24),
+          formatButtonTextStyle: const TextStyle(
+              color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+          leftChevronIcon:
+              const Icon(Icons.chevron_left, color: Colors.white, size: 24),
+          rightChevronIcon:
+              const Icon(Icons.chevron_right, color: Colors.white, size: 24),
         ),
         calendarBuilders: CalendarBuilders<Map<String, dynamic>>(
           defaultBuilder: (context, day, focusedDay) {
@@ -366,15 +387,18 @@ class _AgendaPageState extends State<AgendaPage> {
 
   Widget _buildListHeader() {
     final day = _selectedDay ?? _focusedDay;
-    final dateStr = "${day.day.toString().padLeft(2, '0')}/${day.month.toString().padLeft(2, '0')}/${day.year}";
+    final dateStr =
+        "${day.day.toString().padLeft(2, '0')}/${day.month.toString().padLeft(2, '0')}/${day.year}";
     return RichText(
       text: TextSpan(
-        style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+        style: const TextStyle(
+            color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
         children: [
           const TextSpan(text: "Agendados em "),
           TextSpan(
             text: dateStr,
-            style: const TextStyle(color: AppColors.loginOrange, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+                color: AppColors.loginOrange, fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -424,7 +448,8 @@ class _AgendaPageState extends State<AgendaPage> {
           _searchQuery.isEmpty
               ? "Nenhum cliente agendado neste dia."
               : "Nenhum resultado para \"$_searchQuery\".",
-          style: AppTypography.bodyRegular.copyWith(color: AppColors.loginTextMuted),
+          style: AppTypography.bodyRegular
+              .copyWith(color: AppColors.loginTextMuted),
           textAlign: TextAlign.center,
         ),
       );
@@ -434,11 +459,70 @@ class _AgendaPageState extends State<AgendaPage> {
     );
   }
 
+  int? _getIdAgendamento(Map<String, dynamic> item) {
+    final id = item['id'];
+    if (id == null) return null;
+    if (id is num) return id.toInt();
+    if (id is int) return id;
+    return null;
+  }
+
+  int? _getIdCliente(Map<String, dynamic> item) {
+    final id = item['id_cliente'];
+    if (id == null) return null;
+    if (id is num) return id.toInt();
+    if (id is int) return id;
+    return null;
+  }
+
+  Future<void> _onCertinho(Map<String, dynamic> item) async {
+    final idAg = _getIdAgendamento(item);
+    final idCliente = _getIdCliente(item);
+    final nome = _getClienteNome(item);
+    if (idAg == null || idCliente == null) return;
+    try {
+      await ApiClient.updateAgendamento(idAg, status: 'ATENDIDO');
+      final fila = await ApiClient.addFila(idCliente, idAgendamento: idAg);
+      final idFila = (fila['id'] as num?)?.toInt();
+      if (!mounted) return;
+      if (idFila != null && widget.onMarcarAtendido != null) {
+        widget.onMarcarAtendido!(idFila, nome);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Cliente colocado na fila.')),
+        );
+      }
+      _carregarAgendamentos(_selectedDay ?? _focusedDay);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
+      );
+    }
+  }
+
+  Future<void> _onCancelar(Map<String, dynamic> item) async {
+    final idAg = _getIdAgendamento(item);
+    if (idAg == null) return;
+    try {
+      await ApiClient.updateAgendamento(idAg, status: 'CANCELADO');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Agendamento cancelado.')),
+      );
+      _carregarAgendamentos(_selectedDay ?? _focusedDay);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
+      );
+    }
+  }
+
   Widget _cardAgendamento(Map<String, dynamic> item) {
     final nome = _getClienteNome(item);
     final horario = _getHorario(item);
     final servico = _getServicoNome(item);
-    final cabeleireiro = _getCabeleireiroNome(item);
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
@@ -456,7 +540,8 @@ class _AgendaPageState extends State<AgendaPage> {
                 color: AppColors.loginOrange,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.person_outline, color: Colors.white, size: 24),
+              child: const Icon(Icons.person_outline,
+                  color: Colors.white, size: 24),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -474,11 +559,14 @@ class _AgendaPageState extends State<AgendaPage> {
                   const SizedBox(height: 4),
                   RichText(
                     text: TextSpan(
-                      style: TextStyle(color: AppColors.loginTextMuted, fontSize: 14),
+                      style: TextStyle(
+                          color: AppColors.loginTextMuted, fontSize: 14),
                       children: [
                         TextSpan(
                           text: horario,
-                          style: const TextStyle(color: AppColors.loginOrange, fontWeight: FontWeight.w500),
+                          style: const TextStyle(
+                              color: AppColors.loginOrange,
+                              fontWeight: FontWeight.w500),
                         ),
                         if (servico.isNotEmpty) TextSpan(text: ' • $servico'),
                       ],
@@ -488,16 +576,54 @@ class _AgendaPageState extends State<AgendaPage> {
               ),
             ),
             const SizedBox(width: 8),
-            Text(
-              cabeleireiro,
-              style: TextStyle(
-                color: AppColors.loginTextMuted,
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.end,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => _onCertinho(item),
+                    borderRadius: BorderRadius.circular(8),
+                    child: SizedBox(
+                      width: 44,
+                      height: 44,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.loginOrange.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: AppColors.loginOrange),
+                        ),
+                        child: const Center(
+                          child: Icon(Icons.check_circle,
+                              color: AppColors.loginOrange, size: 24),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => _onCancelar(item),
+                    borderRadius: BorderRadius.circular(8),
+                    child: SizedBox(
+                      width: 44,
+                      height: 44,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.red.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.red),
+                        ),
+                        child: const Center(
+                          child: Icon(Icons.close, color: Colors.red, size: 24),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -509,6 +635,7 @@ class _AgendaPageState extends State<AgendaPage> {
 /// Modal para criar novo agendamento.
 class _ModalNovoAgendamento extends StatefulWidget {
   final DateTime diaInicial;
+
   /// Quando informado (perfil CABELEIREIRO), o dropdown mostra apenas este usuário e fica fixo nele.
   final int? idCabeleireiroLogado;
   final VoidCallback onSaved;
@@ -566,7 +693,9 @@ class _ModalNovoAgendamentoState extends State<_ModalNovoAgendamento> {
       final futures = <Future<dynamic>>[
         ApiClient.listClientes(),
         ApiClient.listServicos(),
-        idLogado != null ? ApiClient.getUsuario(idLogado) : ApiClient.listCabeleireiros(),
+        idLogado != null
+            ? ApiClient.getUsuario(idLogado)
+            : ApiClient.listCabeleireiros(),
       ];
       final results = await Future.wait(futures);
       if (!mounted) return;
@@ -583,7 +712,8 @@ class _ModalNovoAgendamentoState extends State<_ModalNovoAgendamento> {
           }
         }
         _loadingData = false;
-        if (_servicos.isNotEmpty && _idServico == null) _idServico = (_servicos.first['id'] as num).toInt();
+        if (_servicos.isNotEmpty && _idServico == null)
+          _idServico = (_servicos.first['id'] as num).toInt();
       });
     } catch (e) {
       if (!mounted) return;
@@ -610,7 +740,8 @@ class _ModalNovoAgendamentoState extends State<_ModalNovoAgendamento> {
       int idCliente;
       Map<String, dynamic>? existente;
       for (final c in _clientes) {
-        if ((c['nome']?.toString() ?? '').trim().toLowerCase() == nomeCliente.toLowerCase()) {
+        if ((c['nome']?.toString() ?? '').trim().toLowerCase() ==
+            nomeCliente.toLowerCase()) {
           existente = c;
           break;
         }
@@ -661,7 +792,9 @@ class _ModalNovoAgendamentoState extends State<_ModalNovoAgendamento> {
         child: _loadingData
             ? const SizedBox(
                 height: 120,
-                child: Center(child: CircularProgressIndicator(color: AppColors.loginOrange)),
+                child: Center(
+                    child: CircularProgressIndicator(
+                        color: AppColors.loginOrange)),
               )
             : _error != null
                 ? Text(_error!, style: const TextStyle(color: Colors.red))
@@ -671,15 +804,20 @@ class _ModalNovoAgendamentoState extends State<_ModalNovoAgendamento> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        const Text('Cliente', style: TextStyle(color: AppColors.loginTextMuted, fontSize: 12)),
+                        const Text('Cliente',
+                            style: TextStyle(
+                                color: AppColors.loginTextMuted, fontSize: 12)),
                         const SizedBox(height: 4),
                         TextField(
                           controller: _nomeClienteCtrl,
                           style: const TextStyle(color: Colors.white),
-                          decoration: _inputDecoration(hintText: 'Nome do cliente'),
+                          decoration:
+                              _inputDecoration(hintText: 'Nome do cliente'),
                         ),
                         const SizedBox(height: 16),
-                        const Text('Data e horário', style: TextStyle(color: AppColors.loginTextMuted, fontSize: 12)),
+                        const Text('Data e horário',
+                            style: TextStyle(
+                                color: AppColors.loginTextMuted, fontSize: 12)),
                         const SizedBox(height: 4),
                         InkWell(
                           onTap: () async {
@@ -687,10 +825,16 @@ class _ModalNovoAgendamentoState extends State<_ModalNovoAgendamento> {
                               context: context,
                               initialDate: _dataHora,
                               firstDate: DateTime.now(),
-                              lastDate: DateTime.now().add(const Duration(days: 365)),
+                              lastDate:
+                                  DateTime.now().add(const Duration(days: 365)),
                             );
                             if (date != null && mounted) {
-                              setState(() => _dataHora = DateTime(date.year, date.month, date.day, _dataHora.hour, _dataHora.minute));
+                              setState(() => _dataHora = DateTime(
+                                  date.year,
+                                  date.month,
+                                  date.day,
+                                  _dataHora.hour,
+                                  _dataHora.minute));
                             }
                           },
                           child: InputDecorator(
@@ -704,16 +848,27 @@ class _ModalNovoAgendamentoState extends State<_ModalNovoAgendamento> {
                         const SizedBox(height: 8),
                         TextButton.icon(
                           onPressed: () async {
-                            final time = await showTimePicker(context: context, initialTime: TimeOfDay.fromDateTime(_dataHora));
+                            final time = await showTimePicker(
+                                context: context,
+                                initialTime: TimeOfDay.fromDateTime(_dataHora));
                             if (time != null && mounted) {
-                              setState(() => _dataHora = DateTime(_dataHora.year, _dataHora.month, _dataHora.day, time.hour, time.minute));
+                              setState(() => _dataHora = DateTime(
+                                  _dataHora.year,
+                                  _dataHora.month,
+                                  _dataHora.day,
+                                  time.hour,
+                                  time.minute));
                             }
                           },
-                          icon: const Icon(Icons.access_time, color: AppColors.loginOrange, size: 20),
-                          label: const Text('Alterar horário', style: TextStyle(color: AppColors.loginOrange)),
+                          icon: const Icon(Icons.access_time,
+                              color: AppColors.loginOrange, size: 20),
+                          label: const Text('Alterar horário',
+                              style: TextStyle(color: AppColors.loginOrange)),
                         ),
                         const SizedBox(height: 16),
-                        const Text('Serviço (opcional)', style: TextStyle(color: AppColors.loginTextMuted, fontSize: 12)),
+                        const Text('Serviço (opcional)',
+                            style: TextStyle(
+                                color: AppColors.loginTextMuted, fontSize: 12)),
                         const SizedBox(height: 4),
                         DropdownButtonFormField<int?>(
                           value: _idServico,
@@ -721,17 +876,29 @@ class _ModalNovoAgendamentoState extends State<_ModalNovoAgendamento> {
                           dropdownColor: AppColors.loginInputBackground,
                           decoration: _inputDecoration(),
                           items: [
-                            const DropdownMenuItem<int?>(value: null, child: Text('Nenhum', style: TextStyle(color: Colors.white70), overflow: TextOverflow.ellipsis)),
+                            const DropdownMenuItem<int?>(
+                                value: null,
+                                child: Text('Nenhum',
+                                    style: TextStyle(color: Colors.white70),
+                                    overflow: TextOverflow.ellipsis)),
                             ..._servicos.map((s) {
                               final id = (s['id'] as num).toInt();
-                              final desc = s['descricao']?.toString() ?? 'Serviço $id';
-                              return DropdownMenuItem<int?>(value: id, child: Text(desc, style: const TextStyle(color: Colors.white), overflow: TextOverflow.ellipsis));
+                              final desc =
+                                  s['descricao']?.toString() ?? 'Serviço $id';
+                              return DropdownMenuItem<int?>(
+                                  value: id,
+                                  child: Text(desc,
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                      overflow: TextOverflow.ellipsis));
                             }),
                           ],
                           onChanged: (v) => setState(() => _idServico = v),
                         ),
                         const SizedBox(height: 16),
-                        const Text('Cabeleireiro (opcional)', style: TextStyle(color: AppColors.loginTextMuted, fontSize: 12)),
+                        const Text('Cabeleireiro (opcional)',
+                            style: TextStyle(
+                                color: AppColors.loginTextMuted, fontSize: 12)),
                         const SizedBox(height: 4),
                         DropdownButtonFormField<int?>(
                           value: _idCabeleireiro,
@@ -741,24 +908,44 @@ class _ModalNovoAgendamentoState extends State<_ModalNovoAgendamento> {
                           items: widget.idCabeleireiroLogado != null
                               ? _cabeleireiros.map((c) {
                                   final id = (c['id'] as num).toInt();
-                                  final nome = c['nome']?.toString() ?? 'Cabeleireiro $id';
-                                  return DropdownMenuItem<int?>(value: id, child: Text(nome, style: const TextStyle(color: Colors.white), overflow: TextOverflow.ellipsis));
+                                  final nome = c['nome']?.toString() ??
+                                      'Cabeleireiro $id';
+                                  return DropdownMenuItem<int?>(
+                                      value: id,
+                                      child: Text(nome,
+                                          style: const TextStyle(
+                                              color: Colors.white),
+                                          overflow: TextOverflow.ellipsis));
                                 }).toList()
                               : [
-                                  const DropdownMenuItem<int?>(value: null, child: Text('Qualquer', style: TextStyle(color: Colors.white70), overflow: TextOverflow.ellipsis)),
+                                  const DropdownMenuItem<int?>(
+                                      value: null,
+                                      child: Text('Qualquer',
+                                          style:
+                                              TextStyle(color: Colors.white70),
+                                          overflow: TextOverflow.ellipsis)),
                                   ..._cabeleireiros.map((c) {
                                     final id = (c['id'] as num).toInt();
-                                    final nome = c['nome']?.toString() ?? 'Cabeleireiro $id';
-                                    return DropdownMenuItem<int?>(value: id, child: Text(nome, style: const TextStyle(color: Colors.white), overflow: TextOverflow.ellipsis));
+                                    final nome = c['nome']?.toString() ??
+                                        'Cabeleireiro $id';
+                                    return DropdownMenuItem<int?>(
+                                        value: id,
+                                        child: Text(nome,
+                                            style: const TextStyle(
+                                                color: Colors.white),
+                                            overflow: TextOverflow.ellipsis));
                                   }),
                                 ],
-                          onChanged: widget.idCabeleireiroLogado != null ? null : (v) => setState(() => _idCabeleireiro = v),
+                          onChanged: widget.idCabeleireiroLogado != null
+                              ? null
+                              : (v) => setState(() => _idCabeleireiro = v),
                         ),
                         const SizedBox(height: 16),
                         TextField(
                           controller: _obsCtrl,
                           style: const TextStyle(color: Colors.white),
-                          decoration: _inputDecoration().copyWith(hintText: 'Observação (opcional)'),
+                          decoration: _inputDecoration()
+                              .copyWith(hintText: 'Observação (opcional)'),
                         ),
                       ],
                     ),
@@ -767,14 +954,22 @@ class _ModalNovoAgendamentoState extends State<_ModalNovoAgendamento> {
       actions: [
         TextButton(
           onPressed: _saving ? null : widget.onCancel,
-          child: const Text('CANCELAR', style: TextStyle(color: AppColors.loginTextMuted)),
+          child: const Text('CANCELAR',
+              style: TextStyle(color: AppColors.loginTextMuted)),
         ),
         ElevatedButton(
           onPressed: _saving ? null : _salvar,
-          style: ElevatedButton.styleFrom(backgroundColor: AppColors.loginOrange),
+          style:
+              ElevatedButton.styleFrom(backgroundColor: AppColors.loginOrange),
           child: _saving
-              ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-              : const Text('AGENDAR', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                      color: Colors.white, strokeWidth: 2))
+              : const Text('AGENDAR',
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold)),
         ),
       ],
     );
@@ -787,8 +982,12 @@ class _ModalNovoAgendamentoState extends State<_ModalNovoAgendamento> {
       filled: true,
       fillColor: AppColors.loginBackground,
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.white24)),
-      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.loginOrange)),
+      enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.white24)),
+      focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.loginOrange)),
     );
   }
 }

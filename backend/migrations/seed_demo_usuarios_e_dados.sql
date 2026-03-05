@@ -10,19 +10,20 @@
 -- -----------------------------------------------------------------------------
 
 -- DONO (Administrador) — Dashboard completo, filtros, ranking, caixa
-INSERT INTO usuario (id, nome, login, senha, perfil, ativo, avatar)
-VALUES (1, 'Admin', 'dono', '1234', 'DONO', true, NULL)
-ON CONFLICT (id) DO UPDATE SET nome = EXCLUDED.nome, login = EXCLUDED.login, senha = EXCLUDED.senha, perfil = EXCLUDED.perfil, ativo = EXCLUDED.ativo;
+-- status = 'V' (Validado) é obrigatório para conseguir logar
+INSERT INTO usuario (id, nome, login, senha, perfil, status, ativo, avatar)
+VALUES (1, 'Admin', 'dono', '1234', 'DONO', 'V', true, NULL)
+ON CONFLICT (id) DO UPDATE SET nome = EXCLUDED.nome, login = EXCLUDED.login, senha = EXCLUDED.senha, perfil = EXCLUDED.perfil, status = COALESCE(EXCLUDED.status, 'V'), ativo = EXCLUDED.ativo;
 
 -- RECEPCIONISTA — Fila, caixa, encerrados, agenda, produtos/serviços
-INSERT INTO usuario (id, nome, login, senha, perfil, ativo, avatar)
-VALUES (2, 'Recepção', 'recepcao', '1234', 'RECEPCIONISTA', true, NULL)
-ON CONFLICT (id) DO UPDATE SET nome = EXCLUDED.nome, login = EXCLUDED.login, senha = EXCLUDED.senha, perfil = EXCLUDED.perfil, ativo = EXCLUDED.ativo;
+INSERT INTO usuario (id, nome, login, senha, perfil, status, ativo, avatar)
+VALUES (2, 'Recepção', 'recepcao', '1234', 'RECEPCIONISTA', 'V', true, NULL)
+ON CONFLICT (id) DO UPDATE SET nome = EXCLUDED.nome, login = EXCLUDED.login, senha = EXCLUDED.senha, perfil = EXCLUDED.perfil, status = COALESCE(EXCLUDED.status, 'V'), ativo = EXCLUDED.ativo;
 
 -- CABELEIREIRO — Fila, atendimentos, produtos
-INSERT INTO usuario (id, nome, login, senha, perfil, ativo, avatar)
-VALUES (3, 'Cabeleireiro', 'cabeleireiro', '1234', 'CABELEIREIRO', true, NULL)
-ON CONFLICT (id) DO UPDATE SET nome = EXCLUDED.nome, login = EXCLUDED.login, senha = EXCLUDED.senha, perfil = EXCLUDED.perfil, ativo = EXCLUDED.ativo;
+INSERT INTO usuario (id, nome, login, senha, perfil, status, ativo, avatar)
+VALUES (3, 'Cabeleireiro', 'cabeleireiro', '1234', 'CABELEIREIRO', 'V', true, NULL)
+ON CONFLICT (id) DO UPDATE SET nome = EXCLUDED.nome, login = EXCLUDED.login, senha = EXCLUDED.senha, perfil = EXCLUDED.perfil, status = COALESCE(EXCLUDED.status, 'V'), ativo = EXCLUDED.ativo;
 
 -- Ajusta a sequência de id (PostgreSQL) para não conflitar em novos cadastros
 SELECT setval(pg_get_serial_sequence('usuario', 'id'), (SELECT COALESCE(MAX(id), 1) FROM usuario));

@@ -397,11 +397,24 @@ export class DashboardRecepcaoComponent implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
+    this.carregarUsuarioComAvatar();
     this.carregarTudo();
     this.carregarGraficoAtendimentos();
     this.carregarCabeleireiros();
     this.carregarAgenda();
     this.iniciarMonitorRecebimentos();
+  }
+
+  /** Carrega usuário da API (incluindo avatar da coluna USUARIO.avatar) para o rodapé da sidebar. */
+  private carregarUsuarioComAvatar(): void {
+    const id = this.user()?.id;
+    if (id == null) return;
+    this.api.getUsuario(id).subscribe({
+      next: (usuario) => {
+        const current = this.user();
+        if (current) this.auth.updateUser({ ...current, ...usuario });
+      },
+    });
   }
 
   ngOnDestroy(): void {
@@ -2044,14 +2057,17 @@ export class DashboardRecepcaoComponent implements OnInit, OnDestroy {
     return url.replace(/\/api\/?$/, '');
   }
 
+  /** Avatar do usuário: vem da tabela USUARIO (coluna avatar). Carregado no login e ao abrir o dashboard. */
   avatarUrl(): string {
     const u = this.user();
-    if (u?.avatar) {
-      const av = u.avatar;
-      if (av.startsWith('http')) return av;
-      return `${this.serverBase}/${av.startsWith('api/') ? av : 'api/' + av}`;
-    }
     const nome = u?.nome ?? 'R';
+    if (u?.avatar) {
+      const av = u.avatar.trim();
+      if (av.startsWith('data:')) return av;
+      if (av.startsWith('http')) return av;
+      const path = av.startsWith('api/') ? av : 'api/' + av;
+      return `${this.serverBase}/${path}`;
+    }
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(nome)}&background=ff9000&color=1a1a1a`;
   }
 

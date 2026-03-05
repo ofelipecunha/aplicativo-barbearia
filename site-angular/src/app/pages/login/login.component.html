@@ -32,7 +32,22 @@
           <label for="senha">Senha</label>
           <div class="input-wrap">
             <i class="pi pi-lock"></i>
-            <input id="senha" type="password" formControlName="senha" placeholder="********" autocomplete="current-password" />
+            <input
+              id="senha"
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="senha"
+              placeholder="********"
+              autocomplete="current-password"
+            />
+            <button
+              type="button"
+              class="btn-toggle-password"
+              (click)="showPassword = !showPassword"
+              [attr.aria-label]="showPassword ? 'Ocultar senha' : 'Mostrar senha'"
+              tabindex="-1"
+            >
+              <i [class]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
+            </button>
           </div>
           @if (form.get('senha')?.invalid && form.get('senha')?.touched) {
             <small class="error">Senha obrigatória</small>

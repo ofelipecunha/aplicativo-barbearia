@@ -14,6 +14,7 @@ import 'package:barbearia/view/barber_page/barber_home.dart';
 import 'package:barbearia/view/reception_page/reception_home.dart' show showRecebimentoModal;
 import 'package:barbearia/view/reception_page/produtos_page.dart';
 import 'package:barbearia/view/reception_page/agenda_page.dart';
+import 'package:barbearia/view/admin_page/solicitacoes_usuarios_page.dart';
 
 const Color _orange = AppColors.loginOrange;
 // Cores dos cards de filtro (ícone e série no gráfico)
@@ -67,6 +68,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
   int _notificacoesCount = 0;
   /// Cards da agenda: um por agendamento (cliente com horário), com dia, hora, cabeleireiro, serviço e cliente.
   List<Map<String, dynamic>> _agendaPreviewCards = [];
+  /// Clientes na fila aguardando atendimento.
+  List<Map<String, dynamic>> _aguardando = [];
 
   @override
   void initState() {
@@ -76,6 +79,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     _carregarEncerrados();
     _carregarNotificacoesCount();
     _carregarAgendaPreview();
+    _carregarAguardando();
   }
 
   Future<void> _carregarAvatar() async {
@@ -140,7 +144,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   Future<void> _carregarNotificacoesCount() async {
     try {
-      final lista = await ApiClient.getNotificacoes('RECEPCAO');
+      final lista = await ApiClient.getNotificacoes('DONO');
       if (!mounted) return;
       setState(() => _notificacoesCount = lista.length);
     } catch (_) {}
@@ -181,6 +185,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
       });
       if (!mounted) return;
       setState(() => _agendaPreviewCards = cards);
+    } catch (_) {}
+  }
+
+  Future<void> _carregarAguardando() async {
+    try {
+      final lista = await ApiClient.getAguardando();
+      if (!mounted) return;
+      setState(() => _aguardando = lista);
     } catch (_) {}
   }
 
@@ -346,6 +358,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         await _carregarEncerrados();
         await _carregarNotificacoesCount();
         await _carregarAgendaPreview();
+        await _carregarAguardando();
       },
       color: _orange,
       child: SingleChildScrollView(
@@ -421,21 +434,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
               SizedBox(height: SizeConfig.screenHeight! / 45),
               _graficoCard(_graficoLoading),
               SizedBox(height: SizeConfig.screenHeight! / 35),
-              _filtrosCardsGrid(),
-              if (_temFiltroAtivo) ...[
-                const SizedBox(height: 8),
-                TextButton.icon(
-                  onPressed: _limparFiltrosDashboard,
-                  icon: const Icon(Icons.clear_all, size: 18, color: _orange),
-                  label: const Text('Limpar filtros', style: TextStyle(color: _orange, fontWeight: FontWeight.w600)),
-                ),
-              ],
-              SizedBox(height: SizeConfig.screenHeight! / 45),
-              _kpiResumoRow(),
-              SizedBox(height: SizeConfig.screenHeight! / 35),
               _rankingSection(),
               SizedBox(height: SizeConfig.screenHeight! / 35),
               _agendaSection(),
+              SizedBox(height: SizeConfig.screenHeight! / 35),
+              _aguardandoSection(),
               SizedBox(height: SizeConfig.screenHeight! / 20),
             ],
           ],
@@ -1394,10 +1397,99 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
+  Widget _aguardandoSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Clientes aguardando',
+          style: AppTypography.heading4.copyWith(color: Colors.white),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Clientes na fila de espera',
+          style: AppTypography.caption.copyWith(
+            color: AppColors.loginTextMuted,
+            fontSize: 12,
+          ),
+        ),
+        const SizedBox(height: 12),
+        _aguardando.isEmpty
+            ? Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.06),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: Colors.white12),
+                ),
+                child: Center(
+                  child: Text(
+                    'Nenhum cliente aguardando',
+                    style: TextStyle(color: Colors.white54, fontSize: 13),
+                  ),
+                ),
+              )
+            : ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: _aguardando.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 8),
+                itemBuilder: (_, i) {
+                  final item = _aguardando[i];
+                  final nome = item['nome']?.toString() ?? '—';
+                  final hora = item['hora_entrada']?.toString() ?? '';
+                  return Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.06),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: Colors.white12),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: _orange.withOpacity(0.25),
+                            border: Border.all(color: _orange.withOpacity(0.6)),
+                          ),
+                          child: const Icon(Icons.person_outline, color: Colors.white, size: 20),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                nome,
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              if (hora.isNotEmpty)
+                                Text(
+                                  'Entrada: $hora',
+                                  style: TextStyle(color: Colors.white54, fontSize: 12),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+      ],
+    );
+  }
+
   void _abrirModalNotificacoesDono() {
     showNotificacoesModal(
       context,
-      perfil: 'RECEPCAO',
+      perfil: 'DONO',
       onMarcarTodasLidas: () => _carregar(),
       onNotificationTap: _onNotificationTapDono,
     ).then((_) {
@@ -1459,6 +1551,18 @@ class _AdminDashboardState extends State<AdminDashboard> {
           ),
         );
       }
+      return;
+    }
+    if (tipo == 'SOLICITACAO_USUARIO') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const SolicitacoesUsuariosPage(),
+        ),
+      ).then((_) {
+        if (!mounted) return;
+        _carregarNotificacoesCount();
+      });
     }
   }
 

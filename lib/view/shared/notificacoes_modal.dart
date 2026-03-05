@@ -3,8 +3,8 @@ import 'package:barbearia/config/app_colors.dart';
 import 'package:barbearia/config/app_typography.dart';
 import 'package:barbearia/api/api_client.dart';
 
-/// Modal de notificações por perfil: RECEPCAO (RECEBIMENTO/REABASTECER) ou CABELEIREIRO (AGENDA).
-/// [perfil] RECEPCAO ou CABELEIREIRO. Para CABELEIREIRO, [idUsuario] é obrigatório (cada um vê só suas agendas).
+/// Modal de notificações por perfil: RECEPCAO (RECEBIMENTO/REABASTECER), CABELEIREIRO (AGENDA) ou DONO (SOLICITACAO_USUARIO, CLIENTE_NA_FILA, etc.).
+/// [perfil] RECEPCAO, CABELEIREIRO ou DONO. Para CABELEIREIRO, [idUsuario] é obrigatório (cada um vê só suas agendas).
 /// [onNotificationTap] chamado ao tocar numa notificação; a modal será fechada antes.
 Future<void> showNotificacoesModal(
   BuildContext context, {
@@ -207,8 +207,13 @@ class _NotificacaoCard extends StatelessWidget {
 
     final isRecebimento = tipo == 'RECEBIMENTO';
     final isAgenda = tipo == 'AGENDA';
-    final corDestaque = isRecebimento || isAgenda ? AppColors.loginOrange : Colors.blue.shade300;
-    final icone = isRecebimento ? Icons.person_add : (isAgenda ? Icons.calendar_today : Icons.inventory_2_outlined);
+    final isSolicitacaoUsuario = tipo == 'SOLICITACAO_USUARIO';
+    final corDestaque = (isRecebimento || isAgenda || isSolicitacaoUsuario) ? AppColors.loginOrange : Colors.blue.shade300;
+    final icone = isRecebimento
+        ? Icons.person_add
+        : (isAgenda
+            ? Icons.calendar_today
+            : (isSolicitacaoUsuario ? Icons.how_to_reg : Icons.inventory_2_outlined));
 
     final child = Container(
       padding: const EdgeInsets.all(14),
@@ -223,7 +228,7 @@ class _NotificacaoCard extends StatelessWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: (isRecebimento || isAgenda) ? AppColors.loginOrange.withOpacity(0.25) : Colors.blue.withOpacity(0.25),
+              color: (isRecebimento || isAgenda || isSolicitacaoUsuario) ? AppColors.loginOrange.withOpacity(0.25) : Colors.blue.withOpacity(0.25),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(

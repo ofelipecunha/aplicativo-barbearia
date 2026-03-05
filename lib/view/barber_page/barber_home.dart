@@ -193,6 +193,9 @@ class _BarberHomeState extends State<BarberHome> {
               ? widget.userId
               : null,
           showBackButton: false,
+          onMarcarAtendido: (idFila, nomeCliente) {
+            _pegarEAtender({'id': idFila, 'nome': nomeCliente});
+          },
         );
         break;
       case 2:

@@ -1372,7 +1372,7 @@
               @for (r of listaRelatorioCabeleireiros(); track r.nome) {
                 <tr>
                   <td>{{ r.nome || '—' }}</td>
-                  <td class="td-num">{{ r.atendimentos ?? 0 }}</td>
+                  <td class="td-num">{{ r.atendimentos != null ? r.atendimentos : 0 }}</td>
                   <td class="td-num">{{ r.total != null ? ('R$ ' + (r.total | number:'1.2-2':'pt-BR')) : '—' }}</td>
                 </tr>
               }

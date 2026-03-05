@@ -334,7 +334,8 @@ class RemoverDemoData {
     }
     if (perfil == 'DONO') {
       return [
-        {'id': 4, 'tipo': 'CLIENTE_NA_FILA', 'titulo': 'Cliente na fila', 'subtitulo': 'Pedro Oliveira', 'lido': false},
+        {'id': 4, 'tipo': 'SOLICITACAO_USUARIO', 'titulo': 'Nova solicitação de cadastro', 'subtitulo': 'Maria Silva', 'detalhe': 'Aguardando aprovação', 'lido': false},
+        {'id': 5, 'tipo': 'CLIENTE_NA_FILA', 'titulo': 'Cliente na fila', 'subtitulo': 'Pedro Oliveira', 'lido': false},
       ];
     }
     return [];
@@ -350,7 +351,13 @@ class RemoverDemoData {
   static Future<void> encerrarAtendimento(int idAtendimento) async {}
   static Future<void> addServicosAtendimento(int idAtendimento, List<Map<String, dynamic>> itens) async {}
   static Future<void> addProdutosAtendimento(int idAtendimento, List<Map<String, dynamic>> itens) async {}
-  static Future<void> addFila(int idCliente, {int? idAgendamento}) async {}
+  static Future<Map<String, dynamic>> addFila(int idCliente, {int? idAgendamento}) async {
+    return {'id': 99, 'id_cliente': idCliente, 'id_agendamento': idAgendamento, 'status': 'AGUARDANDO'};
+  }
+
+  static Future<Map<String, dynamic>> updateAgendamento(int id, {String? status}) async {
+    return {'id': id, 'status': status ?? 'AGENDADO'};
+  }
   static Future<Map<String, dynamic>> createCliente(String nome, {String telefone = ''}) async {
     return {'id': 99, 'nome': nome, 'telefone': telefone, 'data_cadastro': DateTime.now().toIso8601String()};
   }
