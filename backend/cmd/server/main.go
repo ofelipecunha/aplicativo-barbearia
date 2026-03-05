@@ -50,11 +50,15 @@ func getDSN() string {
 	return "postgres://postgres:123@localhost:5432/barbearia?sslmode=disable"
 }
 
-// CORS middleware para permitir requisições do front (ex.: Angular em localhost:4200).
+// CORS middleware para permitir requisições do front (local e Render).
+// No Render: defina CORS_ORIGIN com a URL do site (ex: https://barbearia-web.onrender.com).
 func CORS() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		origin := c.GetHeader("Origin")
-		if origin == "http://localhost:4200" || origin == "http://127.0.0.1:4200" {
+		allowed := os.Getenv("CORS_ORIGIN") // ex: https://barbearia-web.onrender.com
+		if allowed != "" && origin == allowed {
+			c.Header("Access-Control-Allow-Origin", origin)
+		} else if origin == "http://localhost:4200" || origin == "http://127.0.0.1:4200" {
 			c.Header("Access-Control-Allow-Origin", origin)
 		}
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
