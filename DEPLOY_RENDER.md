@@ -57,7 +57,8 @@ postgresql://barbearia_db_5106_user:1QlweuNPe2Ygzn078zAChac3zXwzsa3a@dpg-d6kcq0d
    - **Branch:** `main`.
    - **Root Directory:** `site-angular`.
    - **Build Command:**  
-     `npm ci && npm run build:render`
+     `npm install && chmod +x node_modules/.bin/ng && npm run build`  
+     (para usar API_URL no build: `npm install && chmod +x node_modules/.bin/ng && npm run build:render`)
    - **Publish Directory:**  
      `dist/barbearia-web-angular/browser`  
      (se não existir `browser`, use apenas `dist/barbearia-web-angular`).
@@ -97,6 +98,9 @@ No **site**, o login e todas as chamadas vão para a API usando a `API_URL` defi
 
 ## Problemas comuns
 
+- **Build do site falha (Permission denied ou Cannot find module './build/index.cjs'):** use no **Build Command** do Static Site:  
+  `npm install && chmod +x node_modules/.bin/ng && npm run build`  
+  O `chmod +x` garante que o `ng` rode no ambiente do Render.
 - **API não conecta no banco:** confira se `DATABASE_URL` (ou PGHOST/PGPORT/etc.) está correto e se o banco está na mesma região.
 - **Site não carrega:** verifique se **Publish Directory** é `dist/barbearia-web-angular/browser` (ou o que o `ng build` gerar).
 - **Erro de CORS no navegador:** confira se `CORS_ORIGIN` no backend é exatamente a URL do site (com `https://`, sem barra no final).
