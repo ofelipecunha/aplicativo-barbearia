@@ -1,9 +1,6 @@
 {
   "name": "barbearia-web-angular",
   "version": "0.1.0",
-  "overrides": {
-    "yargs": "16.2.0"
-  },
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -13,6 +10,9 @@
     "watch": "ng build --watch --configuration development"
   },
   "private": true,
+  "engines": {
+    "node": ">=18.0.0 <22.0.0"
+  },
   "dependencies": {
     "@angular/animations": "^18.2.0",
     "@angular/common": "^18.2.0",

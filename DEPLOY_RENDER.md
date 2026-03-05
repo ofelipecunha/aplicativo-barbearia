@@ -63,11 +63,14 @@ postgresql://barbearia_db_5106_user:1QlweuNPe2Ygzn078zAChac3zXwzsa3a@dpg-d6kcq0d
      `dist/barbearia-web-angular/browser`  
      (se não existir `browser`, use apenas `dist/barbearia-web-angular`).
 
-5. Em **Environment**, adicione:
+5. Em **Environment**, adicione (obrigatório para o build passar):
 
-   | Key       | Value |
-   |-----------|--------|
-   | `API_URL` | URL do backend (ex: `https://barbearia-api.onrender.com`) **sem barra no final**. |
+   | Key           | Value |
+   |---------------|--------|
+   | `NODE_VERSION` | `18` |
+   | `API_URL`     | URL do backend (ex: `https://barbearia-api.onrender.com`) **sem barra no final**. |
+
+   **Importante:** `NODE_VERSION=18` evita erros de módulos (yargs/y18n) no Node 22.
 
 6. Clique em **"Create Static Site"**.
 7. Aguarde o build. A URL do site será algo como:  
@@ -98,9 +101,9 @@ No **site**, o login e todas as chamadas vão para a API usando a `API_URL` defi
 
 ## Problemas comuns
 
-- **Build do site falha (Permission denied ou Cannot find module './build/index.cjs'):** use no **Build Command** do Static Site:  
-  `npm install && chmod +x node_modules/.bin/ng && npm run build`  
-  O `chmod +x` garante que o `ng` rode no ambiente do Render.
+- **Build do site falha (Permission denied, Cannot find module build/index.cjs, y18n):**  
+  1. **Build Command:** `npm install && chmod +x node_modules/.bin/ng && npm run build`.  
+  2. **Node 18:** no serviço **barbearia-web** → **Environment**, adicione **`NODE_VERSION`** = **`18`**. O Render usa Node 22 por padrão; com Node 18 o build do Angular costuma concluir sem esses erros.
 - **API não conecta no banco:** confira se `DATABASE_URL` (ou PGHOST/PGPORT/etc.) está correto e se o banco está na mesma região.
 - **Site não carrega:** verifique se **Publish Directory** é `dist/barbearia-web-angular/browser` (ou o que o `ng build` gerar).
 - **Erro de CORS no navegador:** confira se `CORS_ORIGIN` no backend é exatamente a URL do site (com `https://`, sem barra no final).
